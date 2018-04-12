@@ -297,12 +297,17 @@ $.widget("tc.EventPopover", {
 		The outermost wrapper element should have the .popover class.
 		*/
 		templatePreprocessor: null,
+		placement: 'right',
+		offset: 0,
+
 	},
 	
 	_create: function() {
+		let that = this;
+		let opts = this.options;
 		let popper = this._processTemplate();
 		this.popover = new Popper(this.element, popper, {
-			
+			placement: opts.placement
 		});
 
 		// 点击空白处自动隐藏
@@ -313,6 +318,8 @@ $.widget("tc.EventPopover", {
 				}
 			}
 		})
+
+
 	},
 
 	_processTemplate: function() {
