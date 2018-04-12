@@ -307,7 +307,12 @@ $.widget("tc.EventPopover", {
 		let opts = this.options;
 		let popper = this._processTemplate();
 		this.popover = new Popper(this.element, popper, {
-			placement: opts.placement
+			placement: opts.placement,
+			modifiers: {
+				arrow: {
+				  element: '.arrow'
+				}
+			},
 		});
 
 		// 点击空白处自动隐藏
