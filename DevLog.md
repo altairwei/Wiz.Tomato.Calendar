@@ -23,6 +23,24 @@
   * [ ] 参考C++UI界面的添加到日历功能，有很多颜色，和更多的重复方式。
   * [ ] 新建一个Repeat_Event文件夹，这里面放置重复事件。
 
+* 中国日历
+
+要显示这些农历，节假日信息，有两种方法:
+
+一是直接调用google calendar的订阅地址，把这些信息通过配置fullCalendar自带的events的方式，像显示日程安排一样显示出来，fullCalendar是原生支持google calendar调用的（不过貌似只能调一个文件）；
+
+比如官方示例里的显示美国节假日的例子：
+
+```JavaScript
+// US Holidays
+events: 'http://www.google.com/calendar/feeds/usa__en%40holiday.calendar.google.com/public/basic'
+```
+
+换一下源地址中的ID部分，就可以显示其他日程，比如：
+
+中国节假日(Calendar ID: china__zh_cn@holiday.calendar.google.com); 
+农历(Calendar ID: lunar__zh_cn@holiday.calendar.google.com); 
+
 ## 2 技术信息
 
 `WizCommonUI` 提供了一些工具用来处理HTML标签：
