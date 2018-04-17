@@ -25,6 +25,9 @@
 
 * 中国日历
 
+* 组件
+  * 将 EventPopover 组件的样式分为 Structure 和 theme ，并且加上命名空间。
+
 要显示这些农历，节假日信息，有两种方法:
 
 一是直接调用google calendar的订阅地址，把这些信息通过配置fullCalendar自带的events的方式，像显示日程安排一样显示出来，fullCalendar是原生支持google calendar调用的（不过貌似只能调一个文件）；
