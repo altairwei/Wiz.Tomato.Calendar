@@ -1,0 +1,27 @@
+{
+  "name": "wiz.tomato.calendar",
+  "version": "1.0.0",
+  "description": "A GTD calendar plugin for Wiznote.",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/altairwei/Wiz.Tomato.Calendar.git"
+  },
+  "author": "Altair Wei",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/altairwei/Wiz.Tomato.Calendar/issues"
+  },
+  "homepage": "https://github.com/altairwei/Wiz.Tomato.Calendar#readme",
+  "devDependencies": {
+    "webpack": "^4.12.0",
+    "webpack-cli": "^3.0.8"
+  },
+  "dependencies": {
+    "lodash": "^4.17.10"
+  }
+}
