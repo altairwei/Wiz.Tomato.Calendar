@@ -1,18 +1,18 @@
-export default Config = {
-    colorCount = 12,
-    colorItems = [
-        { "colorValue": "#32CD32", "colorName": g_loc_none },
-        { "colorValue": "#5484ED", "colorName": g_loc_boldBlue },
-        { "colorValue": "#A4BDFE", "colorName": g_loc_blue },
-        { "colorValue": "#46D6DB", "colorName": g_loc_turquoise },
-        { "colorValue": "#7AE7BF", "colorName": g_loc_green },
-        { "colorValue": "#51B749", "colorName": g_loc_boldGreen },
-        { "colorValue": "#FBD75B", "colorName": g_loc_yellow },
-        { "colorValue": "#FFB878", "colorName": g_loc_orange },
-        { "colorValue": "#FF887C", "colorName": g_loc_red },
-        { "colorValue": "#DC2127", "colorName": g_loc_boldRed },
-        { "colorValue": "#DBADFF", "colorName": g_loc_purple },
-        { "colorValue": "#E1E1E1", "colorName": g_loc_gray }
+export default {
+    colorCount: 12,
+    colorItems: [
+        { "colorValue": "#32CD32", "colorName": '橄榄绿' },
+        { "colorValue": "#5484ED", "colorName": '宝石蓝' },
+        { "colorValue": "#A4BDFE", "colorName": '蓝色' },
+        { "colorValue": "#46D6DB", "colorName": '青绿色' },
+        { "colorValue": "#7AE7BF", "colorName": '绿色' },
+        { "colorValue": "#51B749", "colorName": '清新绿' },
+        { "colorValue": "#FBD75B", "colorName": '黄色' },
+        { "colorValue": "#FFB878", "colorName": '橘色' },
+        { "colorValue": "#FF887C", "colorName": '红色' },
+        { "colorValue": "#DC2127", "colorName": '奢华红' },
+        { "colorValue": "#DBADFF", "colorName": '紫色' },
+        { "colorValue": "#E1E1E1", "colorName": '灰色' }
     ],
 
 }

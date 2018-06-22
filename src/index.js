@@ -1,5 +1,8 @@
 import $ from 'jquery';
 import 'fullcalendar';
+import 'fullcalendar/dist/fullcalendar.css';
+import './index.css';
+import {wizRenderAllEvent} from './WizEventDataLoader';
 
 $(function(){
     // 定义变量
@@ -9,7 +12,7 @@ $(function(){
     const y = date.getFullYear();
     const isFirst = true;
 
-    $('#calendar').fullCalendar({
+    const calendar = $('#calendar').fullCalendar({
 		themeSystem: 'standard',
 		height: 'parent',
 		header: {
@@ -75,26 +78,27 @@ $(function(){
 		viewRender: function( view, element ) {
 			// 删除所有EventSources，再重新添加
 			//TODO: 感觉这样造成性能上的损失
-			wizRenderAllEvent();
+			const calendar = $('#calendar');
+			wizRenderAllEvent( view, element, calendar);
 		},
 
 		// 选择动作触发的事件句柄，定义了一个callback
 		select: function(start, end, jsEvent, view){
 			// 弹出“创建日历事件”窗口
 			// 判断是否渲染
-			if ( !g_createDialog ) renderCreatePage(start, end, jsEvent, view);
+			//if ( !g_createDialog ) renderCreatePage(start, end, jsEvent, view);
 			// 传递参数
-			showCreatePage(start, end, jsEvent, view);
+			//showCreatePage(start, end, jsEvent, view);
 		},
 
 		// 日历事件拖动 event, delta, revertFunc, jsEvent, ui, view
 		eventDrop: function(event, delta, revertFunc, jsEvent, ui, view){
 			if (event.id){
 				//
-				wizUpdateDocDrop(event, delta, revertFunc, jsEvent, ui, view);
+				//wizUpdateDocDrop(event, delta, revertFunc, jsEvent, ui, view);
 				
 			} else {
-				revertFunc();
+				//revertFunc();
 			}
 		},
 
@@ -102,10 +106,10 @@ $(function(){
 		eventResize: function(event, delta, revertFunc, jsEvent, ui, view){
 			if (event.id){
 				//
-				wizUpdateDocResize(event, delta, revertFunc, jsEvent, ui, view);
+				//wizUpdateDocResize(event, delta, revertFunc, jsEvent, ui, view);
 				
 			} else {
-				revertFunc();
+				//revertFunc();
 			}
 		},
 
@@ -132,7 +136,7 @@ $(function(){
 			// this 指向包裹事件的<a>元素
 
 			// 判断是否已经渲染弹窗
-			
+			/*
 			if ( !g_editPopper ) {
 				renderEditPopper({
 					'event': event,
@@ -151,6 +155,7 @@ $(function(){
 					reference: this
 				}).EventPopover('update').EventPopover('show');
 			}
+			*/
 
 		}
 		

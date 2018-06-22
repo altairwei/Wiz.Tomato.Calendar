@@ -5,7 +5,7 @@ const webpack = require('webpack');
 
 module.exports = {
   entry: {
-    app: './src/test.js'
+    app: './src/index.js'
   },
   devtool: 'inline-source-map',
   devServer: {
@@ -32,7 +32,7 @@ module.exports = {
     new CleanWebpackPlugin(['dist']),
     new HtmlWebpackPlugin({
       title: '番茄日历',
-      template: 'src/test.html'
+      template: 'src/index.html'
     }),
     new webpack.NamedModulesPlugin(),
     new webpack.HotModuleReplacementPlugin(),

@@ -1,5 +1,10 @@
+import $ from 'jquery';
+import moment from 'moment';
+import 'fullcalendar';
 import { WizDatabase as g_db, WizCommonUI as g_cmn} from './WizInterface'
 import Config from './Config'
+
+const g_cal = $('#calendar').fullCalendar('getCalendar');
 
 export default class CalendarEvent {
 	constructor( data ) {
@@ -47,7 +52,7 @@ export default class CalendarEvent {
 				start = data.CALENDAR_START;
 				end = data.CALENDAR_END;
 				// 判断是否用户自定义背景色
-				bkColor = this._info.ci == 0 ? this._info.b : Config.olorItems[this._info.ci].colorValue;
+				bkColor = this._info.ci == 0 ? this._info.b : Config.colorItems[this._info.ci].colorValue;
 				allDay = data.CALENDAR_END.indexOf("23:59:59") != -1 ? true : false;
 				break;
 			case "FullCalendarEvent":
@@ -106,7 +111,7 @@ export default class CalendarEvent {
 		});
 		// 处理颜色值
 		infoObject.b = '#' + infoObject.b;
-		
+
 		return infoObject;
 	};
 
@@ -132,7 +137,7 @@ export default class CalendarEvent {
 		// 更新背景色'b'
 		infoObject['b'] = this.backgroundColor.replace('#', '');
 		// 更新颜色指数'ci'
-		Config.olorItems.forEach(function(item, index, arr){
+		Config.colorItems.forEach(function(item, index, arr){
 			if ( item.colorValue ==  that.backgroundColor) {
 				// 当日程背景色与色表匹配时则用 color idex 来储存（兼容旧日历插件）
 				infoObject['ci'] = index;
