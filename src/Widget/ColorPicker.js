@@ -1,5 +1,7 @@
 import $ from 'jquery';
+import 'jquery-ui/ui/widget';
 const Huebee = require('huebee');
+import 'huebee/huebee.css'
 
 $.widget("tc.ColorPicker", {
 	options: {
@@ -38,3 +40,24 @@ $.widget("tc.ColorPicker", {
 		
 	}
 })
+
+
+/**
+ * 创建颜色拾取器.
+ * @param {string|HTMLElement} node - 元素或CSS选择器.
+ */
+/*
+export default function createColorPicker(node) {
+	//TODO: 读取Config
+	$(node).ColorPicker({
+		saturations: 2,
+		shades: 5,
+		customColors: [ '#32CD32', '#5484ED', '#A4BDFE', 
+		'#46D6DB', '#7AE7BF', '#51B749',
+		'#FBD75B', '#FFB878', '#FF887C', 
+		'#DC2127', '#DBADFF', '#E1E1E1'	]
+	});
+
+	return $(node);
+}
+*/

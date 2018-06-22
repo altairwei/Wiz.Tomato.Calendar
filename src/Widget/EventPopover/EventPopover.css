@@ -1,0 +1,177 @@
+/* Popover 组件样式
+-------------------------------------------------------------------------*/
+
+
+/* Popover 容器及定位
+-------------------------------------*/
+
+.tc-popover {
+    position: absolute;
+    background: #FFF;
+    color: black;
+    width: auto;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
+    text-align: left;
+}
+
+.tc-popover .arrow {
+    position: absolute;
+    display: block;
+    width: 20px;
+    height: 10px;
+    margin: 0 6px;
+}
+
+.tc-popover .arrow::before, .tc-popover .arrow::after {
+    position: absolute;
+    display: block;
+    content: "";
+    border-color: transparent;
+    border-style: solid;
+}
+
+/* top 放置样式
+-------------------------------------*/
+
+.tc-popover[x-placement^="top"] {
+    margin-bottom: 10px;
+}
+
+.tc-popover[x-placement^="top"] .arrow {
+    bottom: calc((10px + 1px) * -1);
+}
+
+.tc-popover[x-placement^="top"] .arrow::before,
+.tc-popover[x-placement^="top"] .arrow::after {
+    border-width: 10px 10px 0;
+}
+
+.tc-popover[x-placement^="top"] .arrow::before {
+    bottom: 0;
+    border-top-color: rgba(0, 0, 0, 0.25);
+}
+
+.tc-popover[x-placement^="top"] .arrow::after {
+    bottom: 1px;
+    border-top-color: #fff;
+}
+
+/* right 放置样式
+-------------------------------------*/
+
+.tc-popover[x-placement^="right"] {
+    margin-left: 10px;
+}
+
+.tc-popover[x-placement^="right"] .arrow {
+    left: calc((10px + 1px) * -1);
+    width: 10px;
+    height: 20px;
+    margin: 6px 0;
+}
+
+.tc-popover[x-placement^="right"] .arrow::before,
+.tc-popover[x-placement^="right"] .arrow::after {
+    border-width: 10px 10px 10px 0;
+}
+
+.tc-popover[x-placement^="right"] .arrow::before {
+    left: 0;
+    border-right-color: rgba(0, 0, 0, 0.25);
+}
+
+.tc-popover[x-placement^="right"] .arrow::after {
+    left: 1px;
+    border-right-color: #fff;
+}
+
+/* bottom 放置样式
+-------------------------------------*/
+
+.tc-popover[x-placement^="bottom"] {
+    margin-top: 10px;
+}
+
+.tc-popover[x-placement^="bottom"] .arrow {
+    top: calc((10px + 1px) * -1);
+}
+
+.tc-popover[x-placement^="bottom"] .arrow::before,
+.tc-popover[x-placement^="bottom"] .arrow::after {
+    border-width: 0 10px 10px 10px;
+}
+
+.tc-popover[x-placement^="bottom"] .arrow::before {
+    top: 0;
+    border-bottom-color: rgba(0, 0, 0, 0.25);
+}
+
+.tc-popover[x-placement^="bottom"] .arrow::after {
+    top: 1px;
+    border-bottom-color: #f7f7f7; /*这里为了专门适配有标题背景的Popover*/
+}
+
+/* left 放置样式
+-------------------------------------*/
+
+.tc-popover[x-placement^="left"] {
+    margin-right: 10px;
+}
+
+.tc-popover[x-placement^="left"] .arrow {
+    right: calc((10px + 1px) * -1);
+    width: 10px;
+    height: 20px;
+    margin: 6px 0;
+}
+
+.tc-popover[x-placement^="left"] .arrow::before,
+.tc-popover[x-placement^="left"] .arrow::after {
+    border-width: 10px 0 10px 10px;
+}
+
+.tc-popover[x-placement^="left"] .arrow::before {
+    right: 0;
+    border-left-color: rgba(0, 0, 0, 0.25);
+}
+
+.tc-popover[x-placement^="left"] .arrow::after {
+    right: 1px;
+    border-left-color: #fff;
+}
+
+/* Content 标题和内容
+-------------------------------------*/
+
+.tc-popover-header {
+    padding: .5rem .75rem;
+    margin-bottom: 0;
+    font-size: 1rem;
+    color: inherit;
+    background-color: #f7f7f7;
+    border-bottom: 1px solid #ebebeb;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+}
+
+.tc-popover-body {
+    padding: 10px 15px;
+}
+
+#tc-editpopper-eventtitle {
+    border-width: 1px;
+    border-color: transparent;
+    background-color: transparent;
+    padding: 0;
+    margin: 0;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+#tc-popover-event-title:focus,
+#tc-popover-event-title:hover {
+    outline: none;
+    border-bottom-color: black; 
+}

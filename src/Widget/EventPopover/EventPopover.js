@@ -1,16 +1,51 @@
 import $ from 'jquery';
+import 'jquery-ui/ui/widget';
 import Popper from 'popper.js';
+import './EventPopover.css'
 
 $.widget("tc.EventPopover", {
 	options: {
 		title: 'No title !', //String
-		content: '',
-		template: `
-		<div class="popover" role="tooltip">
-		  <div class="arrow"></div>
-		  <div class="popover-header"></div>
-		  <div class="popover-body"></div>
-		</div>`,
+		template:
+		`
+		<div class="tc-popover" role="tooltip">
+			<div class="arrow"></div>
+			<div class="tc-popover-header">
+				<input type="text" id="tc-editpopper-eventtitle"  form='tc-popover-event-editForm' class='eventtitle'>
+			</div>
+			<div class="tc-popover-body">
+				<form id = 'tc-popover-event-editForm' class='form-horizontal'>
+					<div class="form-group">
+						<label for="tc-editpopper-eventdate" class="col-sm-2 col-form-label"><i class='far fa-calendar-alt fa-lg'></i></label>
+						<div class="col-sm-10">
+							<input type="text" readonly class="form-control eventdate" id="tc-editpopper-eventdate">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="tc-editpopper-eventcolor" class="col-sm-2 col-form-label"><i class="fas fa-paint-brush"></i></label>
+						<div class="col-sm-10">
+							<input id="tc-editpopper-eventcolor" class="form-control eventcolor" >
+						</div>
+					</div>
+				</form>
+				<div id="tc-editpopper-buttongroup" class="btn-group" role="group">
+					<button id='tc-editpopper-save' class="btn btn-default" type="button">保存</button>
+					<button id='tc-editpopper-finish' class="btn btn-default" type="button">完成</button>
+					<button id='tc-editpopper-edit' class="btn btn-default" type="button">编辑</button>
+					<button id='tc-editpopper-delete' class="btn btn-default" type="button">删除</button>
+					<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+						<span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu dropdown-menu-right">
+						<li>
+							<a id='tc-editpopper-deleteEventDoc' href='javascript:void(0);'>删除源文档</a>
+						</li>
+					</ul>
+				</div>
+
+			</div>
+		</div>
+		`,
 		templatePreprocessor: null, // 传入 this 作为参数
 		placement: 'right',
 		offset: '10px',
