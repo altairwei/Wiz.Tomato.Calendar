@@ -4,7 +4,7 @@ import 'fullcalendar';
 import { WizDatabase as g_db, WizCommonUI as g_cmn} from './WizInterface'
 import Config from './Config'
 
-const g_cal = $('#calendar').fullCalendar('getCalendar');
+const g_cal = $('#calendar');
 
 export default class CalendarEvent {
 	constructor( data ) {
@@ -211,18 +211,24 @@ export default class CalendarEvent {
 		if ( this.allDay ) {
 			let startStr = moment(this.start).set({'h': 0, 'm': 0, 's': 0}).format('YYYY-MM-DD HH:mm:ss');
 			let endStr = moment(this.end).set({'h': 23, 'm': 59, 's': 59}).format('YYYY-MM-DD HH:mm:ss');
-			setParamValue(doc, "CALENDAR_START", startStr);
-			setParamValue(doc, "CALENDAR_END", endStr);
+			this._setParamValue(doc, "CALENDAR_START", startStr);
+			this._setParamValue(doc, "CALENDAR_END", endStr);
 		} else {
 			let startStr = moment(this.start).format('YYYY-MM-DD HH:mm:ss');
 			let endStr = moment(this.end).format('YYYY-MM-DD HH:mm:ss');
-			setParamValue(doc, "CALENDAR_START", startStr);
-			setParamValue(doc, "CALENDAR_END", endStr);
+			this._setParamValue(doc, "CALENDAR_START", startStr);
+			this._setParamValue(doc, "CALENDAR_END", endStr);
 		}
 
 		// 保存 CALENDAR_INFO
 		this._updateInfo();
-		setParamValue(doc, "CALENDAR_INFO", this._stringifyInfo());
+		this._setParamValue(doc, "CALENDAR_INFO", this._stringifyInfo());
+	};
+
+	// 设置文档属性值
+	_setParamValue(doc, key, value) {
+		if (!doc) return false;
+		doc.SetParamValue(key, value);
 	};
 
 	_createWizEventDoc() {

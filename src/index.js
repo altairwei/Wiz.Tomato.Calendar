@@ -3,12 +3,13 @@ import 'fullcalendar';
 import 'fullcalendar/dist/fullcalendar.css';
 import WizEventDataLoader from './WizEventDataLoader';
 import { renderEditPopper } from './Widget/EventPopover/EventPopover';
+import EventCreateModal from './Modal/EventCreateModal'
 import './index.css';
 
 $(function(){
     // 定义变量
 	const dataLoader = new WizEventDataLoader();
-	let g_editPopper;
+	let g_editPopper, g_createDialog;
 
     const calendar = $('#calendar').fullCalendar({
 		themeSystem: 'standard',
@@ -86,8 +87,10 @@ $(function(){
 		select: function(start, end, jsEvent, view){
 			// 弹出“创建日历事件”窗口
 			// 判断是否渲染
-			//if ( !g_createDialog ) renderCreatePage(start, end, jsEvent, view);
+			if ( !g_createDialog ) g_createDialog = new EventCreateModal({start, end, jsEvent, view});
 			// 传递参数
+			g_createDialog.update({start, end, jsEvent, view});
+			g_createDialog.show();
 			//showCreatePage(start, end, jsEvent, view);
 		},
 

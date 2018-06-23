@@ -2,6 +2,7 @@ import $ from 'jquery';
 import 'jquery-ui/ui/widget';
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/css/bootstrap-theme.css';
+import 'bootstrap/js/dropdown';
 import '@fortawesome/fontawesome-free/js/all';
 import Popper from 'popper.js';
 import './EventPopover.css';
@@ -9,7 +10,7 @@ import { renderFormComponent } from '../../Utils/FormUtils';
 import FormHandles from '../../Utils/FormHandles';
 import { createColorPicker } from '../ColorPicker';
 
-export { renderEditPopper }
+export { renderEditPopper };
 
 $.widget("tc.EventPopover", {
 	options: {

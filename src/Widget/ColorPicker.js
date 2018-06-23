@@ -1,7 +1,9 @@
 import $ from 'jquery';
 import 'jquery-ui/ui/widget';
-const Huebee = require('huebee');
-import 'huebee/huebee.css'
+/* NPM 版本 Huebee 源代码中 pointerdown 事件在 Chrome 55 以后才实现
+ * Wiznote 只能使用跨浏览器兼容版，所以导入打包版 */
+const Huebee = require('huebee/dist/huebee.pkgd'); 
+import 'huebee/dist/huebee.css';
 
 export { createColorPicker };
 
@@ -56,7 +58,8 @@ function createColorPicker(node) {
 		customColors: [ '#32CD32', '#5484ED', '#A4BDFE', 
 		'#46D6DB', '#7AE7BF', '#51B749',
 		'#FBD75B', '#FFB878', '#FF887C', 
-		'#DC2127', '#DBADFF', '#E1E1E1'	]
+		'#DC2127', '#DBADFF', '#E1E1E1'	],
+		"staticOpen": false
 	});
 
 	return $(node);

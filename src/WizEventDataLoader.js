@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import { WizDatabase as objDatabase } from './WizInterface';
 import CalendarEvent from './CalendarEvent';
 
@@ -141,6 +142,34 @@ export default class WizEventDataLoader {
 		this._updateDocModifyDate(doc);
 	};
 
+	// 创建事件 start, end, jsEvent, view
+	/**
+     * 创建事件.
+	 * @param {Object} selectionData FullCalendar 传入的数据.
+	 * @param {Object} selectionData.start Moment 类日期对象.
+	 * @param {Object} selectionData.end Moment 类日期对象.
+	 * @param {Object} selectionData.jsEvent native JavaScript 事件.
+	 * @param {Object} selectionData.view FullCalendar 视图对象.
+	 * @param {Object} userInputs 用户传入的其他信息.
+     * TODO: 该方法可以放置到CalendarEvent的静态方法上
+     */
+	createEvent(selectionData, userInputs){
+		try {
+			// 获取用户设置
+			const newEvent = new CalendarEvent({
+				title: userInputs.title ? userInputs.title : '无标题',
+				start: selectionData.start,
+				end: selectionData.end,
+				allDay: selectionData.start.hasTime() && selectionData.end.hasTime() ? false : true,
+				backgroundColor: userInputs.color ? userInputs.color : '#32CD32',
+			});
+			// 保存并渲染事件
+			newEvent.saveToWizEventDoc();
+			newEvent.refetchData();
+			newEvent.addToFullCalendar();
+		} catch (e) {console.log(e)}
+	}
+
 }
 
 
@@ -156,25 +185,6 @@ function _getWizEvent(start, end) {
 /* 数据获取
 ----------------------------------------------------------------------------------------------------------------------*/
 
-// 创建事件 start, end, jsEvent, view
-function wizCreateEvent(start, end, jsEvent, view){
-	try {
-		// 获取用户设置
-		let colorValue = g_createDialog.find('#tc-createpage-eventcolor').val();
-		let titleValue = g_createDialog.find('#tc-createpage-eventtitle').val();
-		let newEvent = new CalendarEvent({
-			title: titleValue ? titleValue : g_loc_notitle,
-			start: start,
-			end: end,
-			allDay: start.hasTime() && end.hasTime() ? false : true,
-			backgroundColor: colorValue ? colorValue : '#32CD32',
-		});
-		// 保存并渲染事件
-		newEvent.saveToWizEventDoc();
-		newEvent.refetchData();
-		newEvent.addToFullCalendar();
-	} catch (e) {console.log(e)}
-}
 
 /* 杂项和工具
 ----------------------------------------------------------------------------------------------------------------------*/

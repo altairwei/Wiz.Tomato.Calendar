@@ -1,12 +1,21 @@
+import $ from 'jquery';
+import WizEventDataLoader from '../WizEventDataLoader';
+import CalendarEvent from '../CalendarEvent';
+import { WizConfirm } from '../WizInterface';
+
+const g_cal = $('#calendar');
+
 export default class FormHandles {
     constructor() {
 
     };
 
-    onCreateBtnClick(start, end, jsEvent, view) {
-        wizCreateEvent(start, end, jsEvent, view); // 这一步耗时
-        g_createDialog.modal('hide');
-        g_cal.fullCalendar('unselect');
+    onCreateBtnClick(start, end, jsEvent, view, formNode) {
+        const title = $(formNode).find('#tc-createpage-eventtitle').val();
+        const color = $(formNode).find('#tc-createpage-eventcolor').val();
+        new WizEventDataLoader().createEvent({start, end, jsEvent, view}, {title, color}); // 这一步耗时
+        $(formNode).modal('hide');
+        $('#calendar').fullCalendar('unselect');
     };
 
     onSaveBtnClick(event, formNode) {
