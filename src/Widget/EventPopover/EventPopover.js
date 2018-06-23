@@ -1,7 +1,15 @@
 import $ from 'jquery';
 import 'jquery-ui/ui/widget';
+import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap/dist/css/bootstrap-theme.css';
+import '@fortawesome/fontawesome-free/js/all';
 import Popper from 'popper.js';
-import './EventPopover.css'
+import './EventPopover.css';
+import { renderFormComponent } from '../../Utils/FormUtils';
+import FormHandles from '../../Utils/FormHandles';
+import { createColorPicker } from '../ColorPicker';
+
+export { renderEditPopper }
 
 $.widget("tc.EventPopover", {
 	options: {
@@ -46,7 +54,6 @@ $.widget("tc.EventPopover", {
 			</div>
 		</div>
 		`,
-		templatePreprocessor: null, // 传入 this 作为参数
 		placement: 'right',
 		offset: '10px',
 		autoShow: true,
@@ -82,19 +89,67 @@ $.widget("tc.EventPopover", {
 	},
 
 	_processTemplate: function(template) {
-		//TODO: 判断template是字符串还是HTMLElement或者jQuery对象
-		let opts = this.options;
-		let tpp = opts.templatePreprocessor;
+		const that = this;
+		const opts = this.options;
+		const event = opts.args.event;
+		const $popper = $(template);
+		const formHandles = new FormHandles();
 
-		let popper;
-		if ( typeof tpp == 'function' ) {
-			popper = tpp(template, this);
-		} else {
-			popper = $(template);
-			popper.find('.tc-popover-header').text(opts.title);
-		}
+		renderFormComponent($popper, [
+			{// 标题
+				node: '#tc-editpopper-eventtitle',
+				value: event.title,
+				eventName: 'change',
+				handle: () => $popper.find('#tc-editpopper-save').attr('disabled', false)
+			},
+			{// 日期
+				node: '#tc-editpopper-eventdate',
+				value: event.start.format('YYYY-MM-DD HH:mm:ss')
+			},
+			{// 颜色
+				node: '#tc-editpopper-eventcolor',
+				value: event.backgroundColor,
+				renderer: (node) => {
+					$(node).css('background-color', event.backgroundColor);
+					createColorPicker(node);
+				},
+				eventName: 'change',
+				handle: () => $popper.find('#tc-editpopper-save').attr('disabled', false)
+			},
+			{// 保存按钮
+				node: '#tc-editpopper-save',
+				renderer: (node) => $(node).attr("disabled", true),
+				eventName: 'click',
+				handle: () => {
+					formHandles.onSaveBtnClick(event, $popper);
+					that.hide();
+				}
+			},
+			{// 编辑按钮
+				node: '#tc-editpopper-edit',
+				eventName: 'click',
+				//TODO: 处理编辑按钮
+				handle: () => renderEditPage(event, instance)
+			},
+			{// 删除日程数据按钮
+				node: '#tc-editpopper-delete',
+				eventName: 'click',
+				handle: () => {
+					formHandles.onDeleteDataBtnClick(event);
+					this.hide();
+				}
+			},
+			{// 删除源文档按钮
+				node: '#tc-editpopper-deleteEventDoc',
+				eventName: 'click',
+				handle: () => {
+					formHandles.onDeleteDocBtnClick(event);
+					this.hide();
+				}
+			}
+		])
 
-		return popper; // jQuery
+		return $popper; // jQuery
 	},
 
 	_setAutoHide() {
@@ -156,3 +211,23 @@ $.widget("tc.EventPopover", {
 		this.$popperNode = null;
 	}
 })
+
+/**
+ * 渲染事件小弹窗.
+ * @param {object} args 包含FullCalendar传入的参数.
+ * @param {object} args.event FullCalendar事件.
+ * @param {object} args.jsEvent native JavaScript 事件.
+ * @param {object} args.view FullCalendar 视图.
+ * @param {object} element is a jQuery element for the container of the new view.
+ * @return {Object[]} 返回用于FullCalendar渲染的事件数组.
+ */
+function renderEditPopper(args, reference) {
+	// 渲染弹窗
+	const editPopper = $( '<div></div>' ).EventPopover({
+		args: args,
+		placement: 'auto',
+		reference: reference,
+	});
+
+	return editPopper;
+}

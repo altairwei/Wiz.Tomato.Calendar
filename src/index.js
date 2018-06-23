@@ -1,16 +1,14 @@
 import $ from 'jquery';
 import 'fullcalendar';
 import 'fullcalendar/dist/fullcalendar.css';
+import WizEventDataLoader from './WizEventDataLoader';
+import { renderEditPopper } from './Widget/EventPopover/EventPopover';
 import './index.css';
-import {wizRenderAllEvent} from './WizEventDataLoader';
 
 $(function(){
     // 定义变量
-    const date = new Date();
-    const d = date.getDate();
-    const m = date.getMonth();
-    const y = date.getFullYear();
-    const isFirst = true;
+	const dataLoader = new WizEventDataLoader();
+	let g_editPopper;
 
     const calendar = $('#calendar').fullCalendar({
 		themeSystem: 'standard',
@@ -21,7 +19,6 @@ $(function(){
 			right: 'month,agendaWeek,agendaDay,listWeek'
 		},
 		views: {
-			// titleFormat 的语法改变了，原有的以及失效
 			month: {
 				//titleFormat: g_loc_titleformat_month, //var g_loc_titleformat_month = "MMMM yyyy";
 			},
@@ -76,10 +73,13 @@ $(function(){
 
 		// 刷新视图，重新获取日历事件
 		viewRender: function( view, element ) {
-			// 删除所有EventSources，再重新添加
-			//TODO: 感觉这样造成性能上的损失
+			//TODO: 感觉这样造成性能上的损失，是否有更好的方法？
 			const calendar = $('#calendar');
-			wizRenderAllEvent( view, element, calendar);
+			const eventsArr = dataLoader.getEventSource( view, element );
+			calendar.fullCalendar('removeEvents');
+			calendar.fullCalendar('addEventSource', {
+				events: eventsArr
+			});
 		},
 
 		// 选择动作触发的事件句柄，定义了一个callback
@@ -94,22 +94,18 @@ $(function(){
 		// 日历事件拖动 event, delta, revertFunc, jsEvent, ui, view
 		eventDrop: function(event, delta, revertFunc, jsEvent, ui, view){
 			if (event.id){
-				//
-				//wizUpdateDocDrop(event, delta, revertFunc, jsEvent, ui, view);
-				
+				dataLoader.updateEventDataOnDrop(event, delta, revertFunc, jsEvent, ui, view)
 			} else {
-				//revertFunc();
+				revertFunc();
 			}
 		},
 
 		// 日历事件日期范围重置
 		eventResize: function(event, delta, revertFunc, jsEvent, ui, view){
 			if (event.id){
-				//
-				//wizUpdateDocResize(event, delta, revertFunc, jsEvent, ui, view);
-				
+				dataLoader.updateEventDataOnResize(event, delta, revertFunc, jsEvent, ui, view);
 			} else {
-				//revertFunc();
+				revertFunc();
 			}
 		},
 
@@ -136,9 +132,8 @@ $(function(){
 			// this 指向包裹事件的<a>元素
 
 			// 判断是否已经渲染弹窗
-			/*
 			if ( !g_editPopper ) {
-				renderEditPopper({
+				g_editPopper = renderEditPopper({
 					'event': event,
 					'jsEvent': jsEvent,
 					'view': view
@@ -155,7 +150,6 @@ $(function(){
 					reference: this
 				}).EventPopover('update').EventPopover('show');
 			}
-			*/
 
 		}
 		

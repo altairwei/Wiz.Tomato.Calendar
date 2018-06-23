@@ -3,6 +3,8 @@ import 'jquery-ui/ui/widget';
 const Huebee = require('huebee');
 import 'huebee/huebee.css'
 
+export { createColorPicker };
+
 $.widget("tc.ColorPicker", {
 	options: {
 		staticOpen: false, // Displays open and stays open. 
@@ -46,8 +48,7 @@ $.widget("tc.ColorPicker", {
  * 创建颜色拾取器.
  * @param {string|HTMLElement} node - 元素或CSS选择器.
  */
-/*
-export default function createColorPicker(node) {
+function createColorPicker(node) {
 	//TODO: 读取Config
 	$(node).ColorPicker({
 		saturations: 2,
@@ -60,4 +61,3 @@ export default function createColorPicker(node) {
 
 	return $(node);
 }
-*/
