@@ -1,34 +1,26 @@
 import $ from 'jquery';
 import 'bootstrap/js/modal';
-import { renderFormComponent, resetFormInput } from '../Utils/FormUtils';
 import FormHandles from '../Utils/FormHandles';
 import { createDatetimePicker } from '../Widget/DateTimePicker';
 import { createColorPicker } from '../Widget/ColorPicker';
+import EventModal from './EventModal';
 
 
-export default class EventCreateModal {
+export default class EventCreateModal extends EventModal {
+
     constructor(args) {
-        this.args = args;
-        const html = this.getHtmlTemplate();
-        this.modal = $(html).modal({
-            show: false
-        });
-        this.renderTemplate();
+        super(args);
+        window.g_createModal = this;
     };
 
     update(args) {
-        this.args = args;
-        resetFormInput(this.modal, '#tc-createpage-eventstart,#tc-createpage-eventend');
-        this.renderTemplate();
+        this.resetFormInput(this.modal, '#tc-createpage-eventstart,#tc-createpage-eventend');
+        super.update(args);
     };
-
-    show() {
-        this.modal.modal('show');
-    }
 
     renderTemplate() {
         // 渲染 DOM
-        renderFormComponent(this.modal, [
+        this.renderFormComponent(this.modal, [
             {
                 node: this.modal,
                 eventName: 'shown.bs.modal',
@@ -62,7 +54,7 @@ export default class EventCreateModal {
         ]);
     };
 
-    getHtmlTemplate() {
+    get HtmlTemplate() {
         return `
             <div class="modal fade" tabindex="-1" role="dialog" id="tc-createpage-modal" aria-labelledby="tc-createpage-dialogtitle">
                 <div class="modal-dialog modal-dialog-centered" role="document">

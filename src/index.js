@@ -9,7 +9,7 @@ import './index.css';
 $(function(){
     // 定义变量
 	const dataLoader = new WizEventDataLoader();
-	let g_editPopper, g_createDialog;
+	let g_editPopper, g_createModal, g_editModal;
 
     const calendar = $('#calendar').fullCalendar({
 		themeSystem: 'standard',
@@ -87,10 +87,10 @@ $(function(){
 		select: function(start, end, jsEvent, view){
 			// 弹出“创建日历事件”窗口
 			// 判断是否渲染
-			if ( !g_createDialog ) g_createDialog = new EventCreateModal({start, end, jsEvent, view});
+			if ( !window.g_createModal ) new EventCreateModal({start, end, jsEvent, view});
 			// 传递参数
-			g_createDialog.update({start, end, jsEvent, view});
-			g_createDialog.show();
+			window.g_createModal.update({start, end, jsEvent, view});
+			window.g_createModal.show();
 			//showCreatePage(start, end, jsEvent, view);
 		},
 

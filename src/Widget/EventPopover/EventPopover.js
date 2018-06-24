@@ -9,6 +9,7 @@ import './EventPopover.css';
 import { renderFormComponent } from '../../Utils/FormUtils';
 import FormHandles from '../../Utils/FormHandles';
 import { createColorPicker } from '../ColorPicker';
+import EventEditModal from '../../Modal/EventEditModal'
 
 export { renderEditPopper };
 
@@ -130,14 +131,18 @@ $.widget("tc.EventPopover", {
 				node: '#tc-editpopper-edit',
 				eventName: 'click',
 				//TODO: 处理编辑按钮
-				handle: () => renderEditPage(event, instance)
+				handle: () => {
+					if ( !window.g_editModal ) new EventEditModal({event});
+					g_editModal.update({event});
+					g_editModal.show();
+				}
 			},
 			{// 删除日程数据按钮
 				node: '#tc-editpopper-delete',
 				eventName: 'click',
 				handle: () => {
 					formHandles.onDeleteDataBtnClick(event);
-					this.hide();
+					that.hide();
 				}
 			},
 			{// 删除源文档按钮
@@ -145,7 +150,7 @@ $.widget("tc.EventPopover", {
 				eventName: 'click',
 				handle: () => {
 					formHandles.onDeleteDocBtnClick(event);
-					this.hide();
+					that.hide();
 				}
 			}
 		])
