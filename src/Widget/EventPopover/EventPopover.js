@@ -127,11 +127,22 @@ $.widget("tc.EventPopover", {
 					that.hide();
 				}
 			},
+			{// 完成按钮
+				node: '#tc-editpopper-finish',
+				renderer: (node) => $(node).text(
+					parseInt(event.complete) == 5 ? '恢复' : '完成'
+				),
+				eventName: 'click',
+				handle: () => {
+					formHandles.onCompleteBtnClick(event);
+					that.hide();
+				}
+			},
 			{// 编辑按钮
 				node: '#tc-editpopper-edit',
 				eventName: 'click',
-				//TODO: 处理编辑按钮
 				handle: () => {
+					//TODO: 想办法不要用全局变量
 					if ( !window.g_editModal ) new EventEditModal({event});
 					g_editModal.update({event});
 					g_editModal.show();

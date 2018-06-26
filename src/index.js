@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import 'fullcalendar';
 import 'fullcalendar/dist/fullcalendar.css';
 import WizEventDataLoader from './WizEventDataLoader';
@@ -87,11 +86,11 @@ $(function(){
 		select: function(start, end, jsEvent, view){
 			// 弹出“创建日历事件”窗口
 			// 判断是否渲染
+			//TODO: 想办法不要用全局变量
 			if ( !window.g_createModal ) new EventCreateModal({start, end, jsEvent, view});
 			// 传递参数
 			window.g_createModal.update({start, end, jsEvent, view});
 			window.g_createModal.show();
-			//showCreatePage(start, end, jsEvent, view);
 		},
 
 		// 日历事件拖动 event, delta, revertFunc, jsEvent, ui, view
@@ -114,20 +113,13 @@ $(function(){
 
 		eventRender: function(eventObj, $el) {
 			// 元素已经渲染，可修改元素
-			/*
-			$el.css('background-color', '#E1E1E1');
-			$el.find('.fc-content').css('visibility', 'hidden');
-			$el.css('border', '1px solid #E1E1E1');
-			*/
-			/*
-			$el.popover({
-				title: eventObj.title,
-				content: eventObj.description,
-				trigger: 'hover',
-				placement: 'top',
-				container: 'body'
-			});
-			*/
+			const isComplete = parseInt(eventObj.complete) == 5;
+			if ( isComplete ) {
+				$el.css('background-color', '#E1E1E1');
+				$el.find('.fc-content').css('visibility', 'hidden');
+				$el.css('border', '1px solid #E1E1E1');
+			}
+			
 		},
 
 		// 日历事件点击后事件句柄

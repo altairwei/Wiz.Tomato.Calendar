@@ -2,7 +2,6 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const webpack = require('webpack');
-const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 module.exports = {
   entry: {
@@ -28,13 +27,24 @@ module.exports = {
         use: ['file-loader']
       }
     ]
- },
+  },
+  optimization: {
+      splitChunks: {
+          cacheGroups: {
+              commons: {
+                  test: /[\\/]node_modules[\\/]/,
+                  name: 'vendor',
+                  chunks: 'all'
+              }
+          }
+      }
+  },
   plugins: [
     new CleanWebpackPlugin(['dist']),
     new HtmlWebpackPlugin({
       title: '番茄日历',
       template: './src/index.html',
-      chunks: ['app']
+      chunks: ['app', 'vendor']
     }),
     new webpack.NamedModulesPlugin(),
     new webpack.HotModuleReplacementPlugin(),

@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import { WizDatabase as objDatabase } from './WizInterface';
 import CalendarEvent from './CalendarEvent';
 
@@ -43,12 +42,10 @@ export default class WizEventDataLoader {
 		if (end) sql += and1;
 		if (objDatabase.DocumentsDataFromSQL) {
 			try {
-				let data = objDatabase.DocumentsDataFromSQL(sql);
-				//
-				let obj = JSON.parse(data);
-				//
-				if (!obj || !IsArray(obj)) return false;
-				//
+				const data = objDatabase.DocumentsDataFromSQL(sql);
+				const obj = JSON.parse(data);
+				if ( !obj || !isArray(obj) ) return false;
+				console.log(obj);
 				for (let i = 0; i < obj.length; i ++) {
 					events.push(
 						new CalendarEvent(obj[i]).toFullCalendarEvent()
@@ -206,7 +203,7 @@ function formatIntToDateString(n){
 }
 
 // 判断实参是否是数组的实例
-function IsArray(array) {
+function isArray(array) {
     return (array instanceof Array);
 }
 

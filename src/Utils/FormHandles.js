@@ -23,12 +23,28 @@ export default class FormHandles {
         //TODO: 通过在formNode搜索.eventtitle,.eventcolor等class来获取变量
         if (!g_cal) throw new Error('Can not find FullCalendar Widget.');
         // 保存数据
-        let newEvent = new CalendarEvent(event);
+        const newEvent = new CalendarEvent(event);
         newEvent.title = formNode.find('.eventtitle').val();
         newEvent.backgroundColor = formNode.find('.eventcolor').val();
         // 保存到数据文档
         newEvent.saveToWizEventDoc();
         newEvent.refreshEvent(event)
+    };
+
+    onCompleteBtnClick(event) {
+        if (!g_cal) throw new Error('Can not find FullCalendar Widget.');
+        // 修改数据
+        const isComplete = parseInt(event.complete) == 5;
+        if ( isComplete ) {
+            event.complete = '0';
+        } else {
+            event.complete = '5';
+        }
+        // 保存数据
+        const newEvent = new CalendarEvent(event);
+        newEvent.saveToWizEventDoc();
+        // 重新渲染
+        g_cal.fullCalendar( 'updateEvent', event );
     };
 
     onDeleteDataBtnClick(event) {

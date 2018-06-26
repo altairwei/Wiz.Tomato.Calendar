@@ -1,4 +1,3 @@
-import $ from 'jquery';
 import moment from 'moment';
 import 'fullcalendar';
 import { WizDatabase as g_db, WizCommonUI as g_cmn} from './WizInterface'
@@ -9,26 +8,27 @@ const g_cal = $('#calendar');
 export default class CalendarEvent {
 	constructor( data ) {
 		if (!g_db) throw new Error('IWizDatabase is not valid.');
-		let type = this._checkDataType(data);
+		const type = this._checkDataType(data);
 		switch ( type ) {
 			case "WizEvent":
 				try {
-					this._info = this._parseInfo(data.CALENDAR_INFO);
-					this._createEvent(data, type);
+					this._Info = this._parseInfo(data.CALENDAR_INFO);
+					this._ExtraInfo = data.CALENDAR_EXTRAINFO ? this._parseInfo(data.CALENDAR_EXTRAINFO) : this._getDefaultExtraInfo();
+					this._create(data, type);
 				} catch (e) { console.error(e); }
 				break;
 			case "FullCalendarEvent":
 				try {
-					this._createEvent(data, type);
+					this._create(data, type);
 					// 设置info对象
-					this._updateInfo();
+					this._update();
 				} catch (e) { console.error(e); }
 				break;
 			case "GUID":
 				try {
 					//TODO: 获得WizEvent数据，并创建对象
-					let doc = g_db.DocumentFromGUID(data);
-					let newEventData = {
+					const doc = g_db.DocumentFromGUID(data);
+					const newEventData = {
 						"CALENDAR_END" : doc.GetParamValue('CALENDAR_END'),
 						"CALENDAR_INFO" : doc.GetParamValue('CALENDAR_INFO'),
 						"CALENDAR_START" : doc.GetParamValue('CALENDAR_START'),
@@ -37,23 +37,25 @@ export default class CalendarEvent {
 						"title" : doc.Title,
 						"updated" : moment(doc.DateModified).format('YYYY-MM-DD HH:mm:ss')
 					}
-					this._createEvent(newEventData, 'WizEvent');
+					this._create(newEventData, 'WizEvent');
 				} catch (e) { console.error(e); }
 				break;
 		}
 	};
 
-	_createEvent(data, type) {
-		let start, end, id, bkColor, allDay
+	_create(data, type) {
+		let start, end, id, bkColor, allDay, complete, dateCompleted;
 		switch (type) {
 			case "WizEvent":
 				// 统一变量
 				id = data.guid;
 				start = data.CALENDAR_START;
 				end = data.CALENDAR_END;
-				// 判断是否用户自定义背景色
-				bkColor = this._info.ci == 0 ? this._info.b : Config.colorItems[this._info.ci].colorValue;
+				// 判断是否用户自定义背景色，向下兼容原版日历
+				bkColor = this._Info.ci == 0 ? this._Info.b : Config.colorItems[this._Info.ci].colorValue;
 				allDay = data.CALENDAR_END.indexOf("23:59:59") != -1 ? true : false;
+				complete = this._ExtraInfo.Complete;
+				dateCompleted = this._ExtraInfo.DateCompleted;
 				break;
 			case "FullCalendarEvent":
 				id = data.id;
@@ -61,9 +63,11 @@ export default class CalendarEvent {
 				end = data.end;
 				bkColor = data.backgroundColor;
 				allDay = data.allDay ? data.allDay : !$.fullCalendar.moment(data.start).hasTime();
+				complete = data.complete || 0;
+				dateCompleted = data.dateCompleted || '';
 				break;
 			default:
-				throw new Error('Can not identify data type.')
+				throw new Error('Can not identify data type.');
 				break;
 		}
 		// 基本信息
@@ -79,15 +83,17 @@ export default class CalendarEvent {
 		// 设置信息
 		this.textColor = 'black';
 		this.backgroundColor = bkColor;
+		this.complete = complete;
+		this.dateCompleted = dateCompleted;
 	}
 
 	_checkDataType(data) {
-		let objClass = data.constructor;
-        let guidExam = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+		const objClass = data.constructor;
+        const GUID_RegExr = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
         let type;
         switch (objClass) {
             case String:
-                if ( guidExam.test(data) ) type = "GUID";
+                if ( GUID_RegExr.test(data) ) type = "GUID";
                 else throw new Error('Unknown data, cannot create CalendarEvent object.');
                 break;
             case Object:
@@ -101,54 +107,84 @@ export default class CalendarEvent {
         return type;
 	};
 
-	_parseInfo(infoStr) {
-		let infoObject = {};
+	_parseInfo(InfoString) {
+		const InfoObject = {};
 		// 拆解CALENDAR_INFO
-		let infoArr = infoStr.split('/');
-		infoArr.forEach(function(item, index, arr){
-			let pair = item.split('=');
-			infoObject[pair[0]] = pair[1];
+		const InfoArray = InfoString.split('/');
+		InfoArray.forEach(function(item, index, arr){
+			const pair = item.split('=');
+			InfoObject[pair[0]] = pair[1];
 		});
 		// 处理颜色值
-		infoObject.b = '#' + infoObject.b;
+		if ( InfoObject.b ) InfoObject.b = '#' + InfoObject.b;
 
-		return infoObject;
+		return InfoObject;
 	};
 
-	_stringifyInfo(infoObject = this._info) {
-		this._updateInfo();
-		let infoArr = [];
-		let infoAttrArr = Object.keys(infoObject);
-		infoAttrArr.forEach(function(item, index, arr){
-			let singleInfo = `${item}=${infoObject[item]}`;
-			infoArr.push(singleInfo);
+	/**
+     * 将 Info 对象序列化.
+	 * @private
+	 * @param {Object} [InfoObject=] 提供 Info 对象，默认为`this._Info`.
+     * @return {String} 返回用于Info对象字符串.
+     */
+	_stringifyInfo( InfoObject = this._Info ) {
+		if ( !InfoObject ) return '';
+		const InfoArray = [];
+		const InfoObjectKeysArray = Object.keys(InfoObject);
+		InfoObjectKeysArray.forEach(function(item, index, arr){
+			const singleInfo = `${item}=${InfoObject[item]}`;
+			InfoArray.push(singleInfo);
 		});
-		return infoArr.join('/').replace('#', '');
+		return InfoArray.join('/').replace('#', '');
+	};
+
+	_update() {
+		this._updateInfo();
+		this._updateExtraInfo();
 	};
 
 	_updateInfo() {
-		let that = this;
-		let infoObject = {
-			'b': null,
-			'r': '-1',
-			'c': '0',
-			'ci': 0 // 默认 0 表示背景为用户自定义
+		const that = this;
+		const InfoObject = {
+			'b': null, //背景色hex值
+			'r': '-1', //提醒方式
+			'c': '0', //结束提醒信息
+			'ci': 0 //背景色ID，默认 0 表示背景为用户自定义
 		};
 		// 更新背景色'b'
-		infoObject['b'] = this.backgroundColor.replace('#', '');
+		InfoObject['b'] = this.backgroundColor.replace('#', '');
 		// 更新颜色指数'ci'
 		Config.colorItems.forEach(function(item, index, arr){
-			if ( item.colorValue ==  that.backgroundColor) {
-				// 当日程背景色与色表匹配时则用 color idex 来储存（兼容旧日历插件）
-				infoObject['ci'] = index;
+			if ( item.colorValue ==  that.backgroundColor ) {
+				// 当日程背景色与色表匹配时则用 color idex 来储存（兼容原版日历插件）
+				InfoObject['ci'] = index;
 			};
 		});
 		// 应用更新
-		this._info = infoObject;
+		this._Info = InfoObject;
+	};
+
+	_getDefaultExtraInfo() {
+		return {
+			'Complete': 0, //
+			'DateCompleted': '', // ISO 标准日期字符串 YYYY-MM-DD 00:00:00
+			'Prior': 0
+		};
+	};
+
+	_updateExtraInfo() {
+		const ExtraInfoObject = {
+			'Complete': 0,
+			'DateCompleted': '',
+			'Prior': 0
+		};
+		ExtraInfoObject['Complete'] = this.complete;
+		ExtraInfoObject['DateCompleted'] = this.dateCompleted;
+		this._ExtraInfo = ExtraInfoObject;
 	};
 
 	_getEventHtml(title = this.title, content = ''){
-		var htmlText = 
+		const htmlText = 
 			`<html>
 				<head>
 					<meta http-equiv="Content-Type" content="text/html; charset=unicode">
@@ -166,24 +202,25 @@ export default class CalendarEvent {
 
 	toFullCalendarEvent() {
 		// 注意方法返回的只是FullCalendarEvent的数据类型，并不是event对象
-		let that = this;
-		let newEvent = {};
-		let keys = Object.keys(this);
-		keys.splice(keys.findIndex( (i) => {return i == '_info'} ), 1);
+		const that = this;
+		const newEvent = {};
+		const keys = Object.keys(this);
+		keys.splice( keys.findIndex( (i) => i == '_Info' ), 1);
 		keys.forEach(function(item, index, arr){
 			newEvent[item] = that[item];
-		})
+		});
 		return newEvent;
 	};
 
 	toWizEventData() {
-		let that = this;
-		let newEvent = {};
+		this._update();
+		const newEvent = {};
 		newEvent.title = this.title;
 		newEvent.guid = this.id;
 		newEvent.CALENDAR_START = this.allDay ? moment(this.start).format('YYYY-MM-DD 00:00:00') : this.start;
 		newEvent.CALENDAR_END = this.allDay ? moment(this.end).format('YYYY-MM-DD 23:59:59') : this.end;
-		newEvent.CALENDAR_INFO = this._stringifyInfo();
+		newEvent.CALENDAR_INFO = this._stringifyInfo(this._Info);
+		newEvent.CALENDAR_EXTRAINFO = this._stringifyInfo(this._ExtraInfo);
 		newEvent.created = this.created;
 		newEvent.updated = this.updated;
 		return newEvent;
@@ -202,11 +239,9 @@ export default class CalendarEvent {
 	_saveAllProp() {
 		//TODO: 保存全部数据包括Title
 		// 更新事件文档数据
-		let doc = g_db.DocumentFromGUID(this.id);
-
+		const doc = g_db.DocumentFromGUID(this.id);
 		// 保存标题
 		doc.Title = this.title;
-
 		// 保存时间数据
 		if ( this.allDay ) {
 			let startStr = moment(this.start).set({'h': 0, 'm': 0, 's': 0}).format('YYYY-MM-DD HH:mm:ss');
@@ -221,8 +256,9 @@ export default class CalendarEvent {
 		}
 
 		// 保存 CALENDAR_INFO
-		this._updateInfo();
-		this._setParamValue(doc, "CALENDAR_INFO", this._stringifyInfo());
+		this._update();
+		this._setParamValue(doc, "CALENDAR_INFO", this._stringifyInfo(this._Info));
+		this._setParamValue(doc, "CALENDAR_EXTRAINFO", this._stringifyInfo(this._ExtraInfo));
 	};
 
 	// 设置文档属性值
@@ -234,18 +270,18 @@ export default class CalendarEvent {
 	_createWizEventDoc() {
 		//TODO: 保存全部数据包括Title
 		// 创建WizDoc
-		let location = `My Events/${ moment(this.start).format('YYYY-MM') }/`;
-		let objFolder = g_db.GetFolderByLocation(location, true);
-		let tempHtml = g_cmn.GetATempFileName('.html');
-		let htmlText = this._getEventHtml(this.title, '');
+		const location = `My Events/${ moment(this.start).format('YYYY-MM') }/`;
+		const objFolder = g_db.GetFolderByLocation(location, true);
+		const tempHtml = g_cmn.GetATempFileName('.html');
+		const htmlText = this._getEventHtml(this.title, '');
 		g_cmn.SaveTextToFile(tempHtml, htmlText, 'unicode');
-		let doc = objFolder.CreateDocument2(this.title, "");
+		const doc = objFolder.CreateDocument2(this.title, "");
 		doc.ChangeTitleAndFileName(this.title);
 		doc.UpdateDocument6(tempHtml, tempHtml, 0x22);
 		// 设置标签
 		//if ( tags ) doc.SetTagsText2(tags, "Calendar");
 		// 将信息编码到WizDoc属性中去
-		let newEvent = this.toWizEventData();
+		const newEvent = this.toWizEventData();
 		doc.AddToCalendar(newEvent.CALENDAR_START, newEvent.CALENDAR_END, newEvent.CALENDAR_INFO);
 		// change database
 		doc.type = "event";
@@ -292,6 +328,7 @@ export default class CalendarEvent {
 	};
 
 	refreshEvent(event) {
+		//TODO: 应该自动遍历并修改属性
 		if ( event ) {
 			// 重新渲染FullCalendar事件
 			event.title = this.title;

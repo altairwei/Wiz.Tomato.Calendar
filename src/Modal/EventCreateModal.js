@@ -10,6 +10,7 @@ export default class EventCreateModal extends EventModal {
 
     constructor(args) {
         super(args);
+        //TODO: 想办法避免导出全局变量
         window.g_createModal = this;
     };
 
@@ -56,7 +57,7 @@ export default class EventCreateModal extends EventModal {
 
     get HtmlTemplate() {
         return `
-            <div class="modal fade" tabindex="-1" role="dialog" id="tc-createpage-modal" aria-labelledby="tc-createpage-dialogtitle">
+            <div class="modal fade" tabindex="-1" role="dialog" id="tc-EventCreateModal" aria-labelledby="tc-createpage-dialogtitle">
                 <div class="modal-dialog modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-header">
