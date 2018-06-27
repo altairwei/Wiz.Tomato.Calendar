@@ -56,3 +56,18 @@ a[data-goto] {
     font-size: inherit;
     line-height: 1.5;
 }
+
+/* 事件渲染
+-------------------------------------------------------------------------*/
+.tc-complete {
+    background-color: #E1E1E1 !important;
+
+}
+
+.tc-complete > .fc-content {
+    visibility: hidden !important;
+}
+
+.tc-complete:hover > .fc-content {
+    visibility: visible !important;
+}

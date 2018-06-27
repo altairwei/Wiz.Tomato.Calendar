@@ -1,3 +1,4 @@
+import moment from 'moment';
 import 'fullcalendar';
 import 'fullcalendar/dist/fullcalendar.css';
 import WizEventDataLoader from './WizEventDataLoader';
@@ -75,11 +76,13 @@ $(function(){
 		viewRender: function( view, element ) {
 			//TODO: 感觉这样造成性能上的损失，是否有更好的方法？
 			const calendar = $('#calendar');
-			const eventsArr = dataLoader.getEventSource( view, element );
+			const eventSources = dataLoader.getEventSources( view, element );
+			console.log(eventSources);
 			calendar.fullCalendar('removeEvents');
-			calendar.fullCalendar('addEventSource', {
-				events: eventsArr
-			});
+			for (let i=0 ; i < eventSources.length; i++) {
+				calendar.fullCalendar('addEventSource', eventSources[i]);
+			}
+			
 		},
 
 		// 选择动作触发的事件句柄，定义了一个callback
@@ -115,9 +118,8 @@ $(function(){
 			// 元素已经渲染，可修改元素
 			const isComplete = parseInt(eventObj.complete) == 5;
 			if ( isComplete ) {
-				$el.css('background-color', '#E1E1E1');
-				$el.find('.fc-content').css('visibility', 'hidden');
-				$el.css('border', '1px solid #E1E1E1');
+				// 样式
+				$el.addClass('tc-complete');
 			}
 			
 		},

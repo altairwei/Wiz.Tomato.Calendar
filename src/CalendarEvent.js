@@ -1,11 +1,15 @@
 import moment from 'moment';
 import 'fullcalendar';
-import { WizDatabase as g_db, WizCommonUI as g_cmn} from './WizInterface'
-import Config from './Config'
+import { WizDatabase as g_db, WizCommonUI as g_cmn} from './WizInterface';
+import Config from './Config';
 
 const g_cal = $('#calendar');
 
 export default class CalendarEvent {
+	/**
+     * 创建一个通用日程.
+	 * @param {Object} data 原始数据类型，可以是 WizEvent, FullCalendarEvent 以及 GUID.
+     */
 	constructor( data ) {
 		if (!g_db) throw new Error('IWizDatabase is not valid.');
 		const type = this._checkDataType(data);
@@ -52,7 +56,7 @@ export default class CalendarEvent {
 				start = data.CALENDAR_START;
 				end = data.CALENDAR_END;
 				// 判断是否用户自定义背景色，向下兼容原版日历
-				bkColor = this._Info.ci == 0 ? this._Info.b : Config.colorItems[this._Info.ci].colorValue;
+				bkColor = this._Info.ci ? ( parseInt(this._Info.ci) == 0 ? this._Info.b : Config.colorItems[this._Info.ci].colorValue ) : this._Info.b;
 				allDay = data.CALENDAR_END.indexOf("23:59:59") != -1 ? true : false;
 				complete = this._ExtraInfo.Complete;
 				dateCompleted = this._ExtraInfo.DateCompleted;
@@ -200,12 +204,26 @@ export default class CalendarEvent {
 		  return htmlText
 	};
 
+	/**
+     * 根据日程的重复规则生成 FullCalendar eventSource.
+     * @return {Object} eventSource.
+     */
+	generateRepeatEvents(start, end) {
+		if ( !this.rptRule ) throw new Error('Cannot find CalendarEvent repeat rule.');
+		//TODO: 根据rptRule生成重复日期
+
+		//TODO: 根据 start, end 限制重复日期上下限, 并且禁止在CalendarEvent.start当天再创建重复事件
+
+		//TODO: 根据重复日期循环生成重复事件，并组装成 source object 格式
+	};
+
 	toFullCalendarEvent() {
 		// 注意方法返回的只是FullCalendarEvent的数据类型，并不是event对象
 		const that = this;
 		const newEvent = {};
 		const keys = Object.keys(this);
 		keys.splice( keys.findIndex( (i) => i == '_Info' ), 1);
+		keys.splice( keys.findIndex( (i) => i == '_ExtraInfo' ), 1);
 		keys.forEach(function(item, index, arr){
 			newEvent[item] = that[item];
 		});

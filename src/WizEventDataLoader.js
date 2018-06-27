@@ -8,23 +8,37 @@ import CalendarEvent from './CalendarEvent';
 export default class WizEventDataLoader {
 	/**
      * 创造一个事件数据加载器.
+	 * @param {string} start 查询起始日期，ISO标准日期字符串.
+	 * @param {string} end 查询截至日期，ISO标准日期字符串.
      */
-	constructor() {
+	constructor(start, end) {
 		if (!objDatabase) throw new Error('WizDatabase not valid !');
 		this.Database = objDatabase;
 		this.userName = objDatabase.UserName;
+		this.start = start;
+		this.end = end;
 	};
 
 	/**
      * 获得渲染后的所有FullCalendar事件.
 	 * @param {object} view is the View Object of FullCalendar for the new view.
 	 * @param {object} element is a jQuery element for the container of the new view.
-     * @return {Object[]} 返回用于FullCalendar渲染的事件数组.
+     * @return {Object[]} 返回用于FullCalendar 渲染的 eventSources 数组.
      */
-	getEventSource( view, element ){
+	getEventSources( view, element ){
 		const currentView = view;
-		const eventsArr = this._getAllOriginalEvent([], this._d2s(currentView.start.toDate()), this._d2s(currentView.end.toDate()));
-		return eventsArr;
+		const eventSources = [];
+		//获取普通日程
+		const generalEventSource = {
+			type: 'generalEvents',
+			events: this._getAllOriginalEvent([], this._d2s(currentView.start.toDate()), this._d2s(currentView.end.toDate()))
+		}
+		eventSources.push(generalEventSource);
+		
+		//TODO: 获取重复日程
+		//this._getAllRepeatEvent();
+		//
+		return eventSources;
 	};
 
 	/**
@@ -45,7 +59,6 @@ export default class WizEventDataLoader {
 				const data = objDatabase.DocumentsDataFromSQL(sql);
 				const obj = JSON.parse(data);
 				if ( !obj || !isArray(obj) ) return false;
-				console.log(obj);
 				for (let i = 0; i < obj.length; i ++) {
 					events.push(
 						new CalendarEvent(obj[i]).toFullCalendarEvent()
@@ -77,6 +90,39 @@ export default class WizEventDataLoader {
 			*/		
 		}
 
+	};
+
+	/**
+     * 从WizDatabase中获取所有循环重复事件.
+	 * 从创建事件的日期开始到ENDRECURRENCE结束
+     * @return {Object[]} 返回用于FullCalendar渲染的事件数组.
+     */
+	_getAllRepeatEvent(){
+		const rptRule = {
+			"Daily": "Daily", //每日
+			"EveryWeekday": "EveryWeekday", //每个工作日
+			"EveryWeek": "EveryWeek7123456", //每周 日一二三四五六
+			"Every2Weeks" : "Every2Weeks", //每两周
+			"Monthly": "Monthly", //每月
+			"Yearly": "Yearly", //每年
+			"ChineseMonthly": "ChineseMonthly", //农历每月
+			"ChineseYearly": "ChineseYearly", //农历每年
+		};
+		const repeatEvents = [];
+		const sql = "DOCUMENT_LOCATION not like '/Deleted Items/%' and (KB_GUID is null or KB_GUID = '') and " + 
+					"DOCUMENT_GUID in (select DOCUMENT_GUID from WIZ_DOCUMENT_PARAM where PARAM_NAME='CALENDAR_RECURRENCE')";
+
+		const data = objDatabase.DocumentsDataFromSQL(sql);
+		const obj = JSON.parse(data);
+		if ( !obj || !isArray(obj) ) return false;
+		for (let i = 0; i < obj.length; i ++) {
+			repeatEvents.push(
+				//new CalendarEvent(obj[i]).toFullCalendarEvent()
+			);
+		}
+		
+		return repeatEvents;
+		console.log(repeatEvents);
 	};
 
 	// 日历事件拖动后更新数据
@@ -176,6 +222,73 @@ function _getWizEvent(start, end) {
 	let events = [];
 	let EventCollection = objDatabase.GetCalendarEvents2(start, end);
 	return events
+}
+
+// 获得渲染后的重复日期
+function getRenderRepeatDay(){
+	var dayArray = new Array();
+	var eventStart = new Date(_s2d(g_eventStart));
+		
+	switch (g_repeatRule){
+            case "EveryWeek1":
+            case "EveryWeek2":
+            case "EveryWeek3":
+            case "EveryWeek4":
+            case "EveryWeek5":
+            case "EveryWeek6":
+            case "EveryWeek7":
+				getWeeklyRepeatDay(dayArray, [g_repeatRule.charAt(9)]);
+                break;
+            case "EveryWeekday":
+				getWeeklyRepeatDay(dayArray, [1, 2, 3, 4, 5]);
+                break;
+            case "EveryWeekday135":
+				getWeeklyRepeatDay(dayArray, [1, 3, 5]);
+				break;
+            case "EveryWeekday24":
+				getWeeklyRepeatDay(dayArray, [2, 4]);
+				break;
+            case "EveryWeekday67":
+				getWeeklyRepeatDay(dayArray, [6, 7]);
+				break;
+            case "Daily":
+				getWeeklyRepeatDay(dayArray, [1, 2, 3, 4, 5, 6, 7]);
+				break;
+            case "Weekly":// 每周
+				getWeeklyRepeatDay(dayArray, [eventStart.getDay()]);
+				break;
+            case "Every2Weeks":
+				getWeeklyRepeatDay(dayArray, [eventStart.getDay()]);
+				for (var i = 0; i < dayArray.length; ++ i){
+					var inter = _interDays(_d2s(eventStart), _d2s(dayArray[i][0]));
+					if ((parseFloat((inter-1)/7.0) % 2) != 0 ){
+						dayArray.splice(i, 1);
+						i --;
+					}
+				}
+				break;
+            case "Monthly":
+				getMonthlyRepeatDay(dayArray);
+				break;
+            case "Yearly":
+				getYearlyRepeatDay(dayArray);
+				break;
+			// TODO: 汉字需要考虑
+            case "ChineseMonthly":
+                getChineseRepeatDay(dayArray, '月');
+				break;
+            case "ChineseYearly":
+                getChineseRepeatDay(dayArray, '历');
+				break;
+			default:{
+				if (g_repeatRule.indexOf("EveryWeek") == 0){
+					var days = g_repeatRule.substr("EveryWeek".length).split('');
+					getWeeklyRepeatDay(dayArray, days);
+				}
+			}
+        }
+        
+	return dayArray;
 }
 
 

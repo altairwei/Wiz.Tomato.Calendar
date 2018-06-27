@@ -169,8 +169,8 @@
     font-weight: bold;
 }
 
-#tc-popover-event-title:focus,
-#tc-popover-event-title:hover {
+#tc-editpopper-eventtitle:focus,
+#tc-editpopper-eventtitle:hover {
     outline: none;
     border-bottom-color: black; 
 }
