@@ -26,17 +26,20 @@ export default class WizEventDataLoader {
      * @return {Object[]} 返回用于FullCalendar 渲染的 eventSources 数组.
      */
 	getEventSources( view, element ){
-		const currentView = view;
-		const eventSources = [];
+		const viewStart = view.start.format('YYYY-MM-DD HH:mm:ss');
+		const viewEnd = view.end.format('YYYY-MM-DD HH:mm:ss');
+		let eventSources = [];
 		//获取普通日程
 		const generalEventSource = {
 			type: 'generalEvents',
-			events: this._getAllOriginalEvent([], this._d2s(currentView.start.toDate()), this._d2s(currentView.end.toDate()))
+			//events: this._getAllOriginalEvent([], this._d2s(currentView.start.toDate()), this._d2s(currentView.end.toDate()))
+			events: this._getAllOriginalEvent(viewStart, viewEnd)
 		}
 		eventSources.push(generalEventSource);
 		
 		//TODO: 获取重复日程
-		//this._getAllRepeatEvent();
+		const repeatEventSources = this._getAllRepeatEvent(viewStart, viewEnd);
+		eventSources = eventSources.concat(repeatEventSources);
 		//
 		return eventSources;
 	};
@@ -48,7 +51,8 @@ export default class WizEventDataLoader {
 	 * @param {string} end ISO标准日期字符串.
      * @return {Object[]} 返回用于FullCalendar渲染的事件数组.
      */
-	_getAllOriginalEvent(events, start, end){
+	_getAllOriginalEvent(start, end){
+		const events = [];
 		let sql = `DOCUMENT_LOCATION not like '/Deleted Items/%' and (KB_GUID is null or KB_GUID = '')`;
 		let and1 = ` and DOCUMENT_GUID in (select DOCUMENT_GUID from WIZ_DOCUMENT_PARAM where PARAM_NAME = 'CALENDAR_START'  and  PARAM_VALUE <= '${end}' )`;
 		let and2 = ` and DOCUMENT_GUID in (select DOCUMENT_GUID from WIZ_DOCUMENT_PARAM where PARAM_NAME = 'CALENDAR_END'  and  PARAM_VALUE >= '${start}' )`;
@@ -58,7 +62,7 @@ export default class WizEventDataLoader {
 			try {
 				const data = objDatabase.DocumentsDataFromSQL(sql);
 				const obj = JSON.parse(data);
-				if ( !obj || !isArray(obj) ) return false;
+				if ( !obj || !Array.isArray(obj) ) return false;
 				for (let i = 0; i < obj.length; i ++) {
 					events.push(
 						new CalendarEvent(obj[i]).toFullCalendarEvent()
@@ -95,34 +99,26 @@ export default class WizEventDataLoader {
 	/**
      * 从WizDatabase中获取所有循环重复事件.
 	 * 从创建事件的日期开始到ENDRECURRENCE结束
-     * @return {Object[]} 返回用于FullCalendar渲染的事件数组.
+     * @return {Object[]} 返回用于FullCalendar渲染的 eventSource 数组.
      */
-	_getAllRepeatEvent(){
-		const rptRule = {
-			"Daily": "Daily", //每日
-			"EveryWeekday": "EveryWeekday", //每个工作日
-			"EveryWeek": "EveryWeek7123456", //每周 日一二三四五六
-			"Every2Weeks" : "Every2Weeks", //每两周
-			"Monthly": "Monthly", //每月
-			"Yearly": "Yearly", //每年
-			"ChineseMonthly": "ChineseMonthly", //农历每月
-			"ChineseYearly": "ChineseYearly", //农历每年
-		};
+	_getAllRepeatEvent(start, end){
 		const repeatEvents = [];
 		const sql = "DOCUMENT_LOCATION not like '/Deleted Items/%' and (KB_GUID is null or KB_GUID = '') and " + 
 					"DOCUMENT_GUID in (select DOCUMENT_GUID from WIZ_DOCUMENT_PARAM where PARAM_NAME='CALENDAR_RECURRENCE')";
 
 		const data = objDatabase.DocumentsDataFromSQL(sql);
+		if ( !data ) return false;
+		
 		const obj = JSON.parse(data);
-		if ( !obj || !isArray(obj) ) return false;
+		if ( !obj || !Array.isArray(obj) ) return false;
+		
 		for (let i = 0; i < obj.length; i ++) {
 			repeatEvents.push(
-				//new CalendarEvent(obj[i]).toFullCalendarEvent()
-			);
+				new CalendarEvent(obj[i]).generateRepeatEvents(start, end)
+			)
 		}
-		
 		return repeatEvents;
-		console.log(repeatEvents);
+		
 	};
 
 	// 日历事件拖动后更新数据
@@ -143,6 +139,7 @@ export default class WizEventDataLoader {
 			this._setParamValue(doc, "CALENDAR_START", startStr);
 			this._setParamValue(doc, "CALENDAR_END", endStr);
 		}
+		//TODO: 更新CALENDAR_RECURRENCE数据
 		// 
 		this._updateDocModifyDate(doc);
 	};
@@ -313,11 +310,6 @@ function isChrome() {
 function formatIntToDateString(n){
 		
 	return n < 10 ? '0' + n : n;
-}
-
-// 判断实参是否是数组的实例
-function isArray(array) {
-    return (array instanceof Array);
 }
 
 // 检查及增加数值字符串长度，例如：'2' -> '02'

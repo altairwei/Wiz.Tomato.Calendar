@@ -23,9 +23,10 @@ export default class FormHandles {
         //TODO: 通过在formNode搜索.eventtitle,.eventcolor等class来获取变量
         if (!g_cal) throw new Error('Can not find FullCalendar Widget.');
         // 保存数据
-        const newEvent = new CalendarEvent(event);
+        const newEvent = new CalendarEvent(event.id);
         newEvent.title = formNode.find('.eventtitle').val();
         newEvent.backgroundColor = formNode.find('.eventcolor').val();
+        console.log(newEvent)
         // 保存到数据文档
         newEvent.saveToWizEventDoc();
         newEvent.refreshEvent(event)

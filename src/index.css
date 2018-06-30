@@ -60,14 +60,14 @@ a[data-goto] {
 /* 事件渲染
 -------------------------------------------------------------------------*/
 .tc-complete {
-    background-color: #E1E1E1 !important;
+    opacity: 0.3;
 
 }
 
 .tc-complete > .fc-content {
-    visibility: hidden !important;
+    text-decoration: line-through !important;
 }
 
-.tc-complete:hover > .fc-content {
-    visibility: visible !important;
+.tc-complete:hover {
+    opacity: 1;
 }

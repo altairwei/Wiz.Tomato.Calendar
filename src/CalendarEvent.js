@@ -15,18 +15,8 @@ export default class CalendarEvent {
 		const type = this._checkDataType(data);
 		switch ( type ) {
 			case "WizEvent":
-				try {
-					this._Info = this._parseInfo(data.CALENDAR_INFO);
-					this._ExtraInfo = data.CALENDAR_EXTRAINFO ? this._parseInfo(data.CALENDAR_EXTRAINFO) : this._getDefaultExtraInfo();
-					this._create(data, type);
-				} catch (e) { console.error(e); }
-				break;
 			case "FullCalendarEvent":
-				try {
-					this._create(data, type);
-					// 设置info对象
-					this._update();
-				} catch (e) { console.error(e); }
+				this._create(data, type);
 				break;
 			case "GUID":
 				try {
@@ -35,6 +25,7 @@ export default class CalendarEvent {
 					const newEventData = {
 						"CALENDAR_END" : doc.GetParamValue('CALENDAR_END'),
 						"CALENDAR_INFO" : doc.GetParamValue('CALENDAR_INFO'),
+						"CALENDAR_EXTRAINFO" : doc.GetParamValue('CALENDAR_EXTRAINFO'),
 						"CALENDAR_START" : doc.GetParamValue('CALENDAR_START'),
 						"created" : moment(doc.DateCreated).format('YYYY-MM-DD HH:mm:ss'),
 						"guid" : doc.GUID,
@@ -48,9 +39,12 @@ export default class CalendarEvent {
 	};
 
 	_create(data, type) {
-		let start, end, id, bkColor, allDay, complete, dateCompleted;
+		let start, end, id, bkColor, allDay, complete, dateCompleted, rptRule;
 		switch (type) {
+			case "GUID":
 			case "WizEvent":
+				this._Info = this._parseInfo(data.CALENDAR_INFO);
+				this._ExtraInfo = data.CALENDAR_EXTRAINFO ? this._parseInfo(data.CALENDAR_EXTRAINFO) : this._getDefaultExtraInfo();
 				// 统一变量
 				id = data.guid;
 				start = data.CALENDAR_START;
@@ -60,6 +54,7 @@ export default class CalendarEvent {
 				allDay = data.CALENDAR_END.indexOf("23:59:59") != -1 ? true : false;
 				complete = this._ExtraInfo.Complete;
 				dateCompleted = this._ExtraInfo.DateCompleted;
+				rptRule = data.CALENDAR_RECURRENCE;
 				break;
 			case "FullCalendarEvent":
 				id = data.id;
@@ -69,6 +64,7 @@ export default class CalendarEvent {
 				allDay = data.allDay ? data.allDay : !$.fullCalendar.moment(data.start).hasTime();
 				complete = data.complete || 0;
 				dateCompleted = data.dateCompleted || '';
+				rptRule = data.rptRule;
 				break;
 			default:
 				throw new Error('Can not identify data type.');
@@ -89,6 +85,9 @@ export default class CalendarEvent {
 		this.backgroundColor = bkColor;
 		this.complete = complete;
 		this.dateCompleted = dateCompleted;
+		this.rptRule = rptRule;
+		//
+		this._update();
 	}
 
 	_checkDataType(data) {
@@ -206,24 +205,160 @@ export default class CalendarEvent {
 
 	/**
      * 根据日程的重复规则生成 FullCalendar eventSource.
-     * @return {Object} eventSource.
+	 * @param {String} start 查询起始，ISO 标准日期字符串.
+	 * @param {String} end 查询结束，ISO 标准日期字符串.
+     * @returns {Object} eventSource.
      */
 	generateRepeatEvents(start, end) {
 		if ( !this.rptRule ) throw new Error('Cannot find CalendarEvent repeat rule.');
-		//TODO: 根据rptRule生成重复日期
+		const eventSource = {
+			id: this.id,
+			events: []
+		}
+		//根据rptRule生成重复日期，并生成事件
+		const dayArray = this._getRenderRepeatDay(start, end);
+		for ( let day of dayArray ) {
+			// day 是一个Moment日期对象
+			const newEvent = this.toFullCalendarEvent();
+			newEvent.start = day.format('YYYY-MM-DD HH:mm:ss');
+			newEvent.end = moment(newEvent.end).add( day.diff( moment(this.start) ) ).format('YYYY-MM-DD HH:mm:ss');
+			eventSource.events.push(newEvent);
+		}
 
-		//TODO: 根据 start, end 限制重复日期上下限, 并且禁止在CalendarEvent.start当天再创建重复事件
-
-		//TODO: 根据重复日期循环生成重复事件，并组装成 source object 格式
+		return eventSource;
 	};
+
+	/**
+     * 根据规则生成日期数组
+     * @returns {Object[]} 包含一系列`Moment`日期对象的数组.
+     */
+	_getRenderRepeatDay(start, end) {
+		/*
+		const rptRule = {
+			"Daily": "Daily", //每日
+			"EveryWeekday": "EveryWeekday135", //每个工作日135
+			"EveryWeek": "EveryWeek7123456", //每周 日一二三四五六
+			"Every2Weeks" : "Every2Weeks", //每两周
+			"Monthly": "Monthly", //每月
+			"Yearly": "Yearly", //每年
+			"ChineseMonthly": "ChineseMonthly", //农历每月
+			"ChineseYearly": "ChineseYearly", //农历每年
+		};
+		*/
+		const rptRule = this.rptRule;
+		let dayArray;
+		console.log(rptRule)
+		if (/^Every(|\d)Week(|day)(\d*)$/.test(rptRule) ) {
+			// 每[1234]周[7123456]
+			const results = /^Every(|\d)Week(|day)(\d*)$/.exec(rptRule);
+			const interWeek = results[1]
+			const number = results[3];
+			dayArray = this._getWeeklyRepeatDay(number, start, end, interWeek);
+		} else if ( /^EveryWeek|EveryWeekday$/.test(rptRule) ) {
+			// 每个工作日
+			dayArray = this._getWeeklyRepeatDay('12345', start, end);
+		} else if ( "Daily" == rptRule ) {
+			dayArray = this._getWeeklyRepeatDay('0123456', start, end);
+		} else if ( "Weekly" == rptRule ) {
+			const curWeekDay = moment(this.start).day();
+			dayArray = this._getWeeklyRepeatDay(`${curWeekDay}`, start, end);
+		}
+		//TODO: 完成剩下的重复规则
+		/*
+		switch ( true ){
+				// 每天，固定间隔
+				case "Daily":
+					getWeeklyRepeatDay(dayArray, [1, 2, 3, 4, 5, 6, 7]);
+					break;
+				// 每周，固定间隔
+				case "Weekly":
+					getWeeklyRepeatDay(dayArray, [eventStart.getDay()]);
+					break;
+				// 每两周，固定间隔
+				case "Every2Weeks":
+					getWeeklyRepeatDay(dayArray, [eventStart.getDay()]);
+					for (var i = 0; i < dayArray.length; ++ i){
+						var inter = _interDays(_d2s(eventStart), _d2s(dayArray[i][0]));
+						if ((parseFloat((inter-1)/7.0) % 2) != 0 ){
+							dayArray.splice(i, 1);
+							i --;
+						}
+					}
+					break;
+				// 每月
+				case "Monthly":
+					getMonthlyRepeatDay(dayArray);
+					break;
+				// 每年
+				case "Yearly":
+					getYearlyRepeatDay(dayArray);
+					break;
+				// TODO: 汉字需要考虑
+				case "ChineseMonthly":
+					getChineseRepeatDay(dayArray, '月');
+					break;
+				case "ChineseYearly":
+					getChineseRepeatDay(dayArray, '历');
+					break;
+				default:{
+					if (g_repeatRule.indexOf("EveryWeek") == 0){
+						var days = g_repeatRule.substr("EveryWeek".length).split('');
+						getWeeklyRepeatDay(dayArray, days);
+					}
+				}
+				
+			}
+			*/
+			return dayArray;
+	};
+
+	/**
+     * 根据每周规则生成日期数组
+	 * @param {String} number 整数字符串表示的规则；
+     * @returns {Object[]} 包含一系列Moment日期对象的数组.
+     */
+	_getWeeklyRepeatDay(number, start, end, interWeeks = '1') {
+		//返回[{start, end}, {start, end}, {start, end}]
+		//考虑渲染范围，以及结束循环的日期
+		const viewStart = moment(this.start);
+		const viewEnd = moment(end);
+		let dayArray = [];
+		const intervalWeeks = interWeeks ? parseInt(interWeeks) : 1;
+		const weekdays = number.replace('7', '0').split(''); //周日0~6周六
+		for ( let day of weekdays ) {
+			//
+			let curWeekDay = parseInt(day), newEventStartDate = moment(viewStart)
+			do {
+				// 创建新Moment对象
+				newEventStartDate = moment(viewStart).day(curWeekDay);
+				// 根据日程设置time part
+				const eventStart = moment(this.start)
+				newEventStartDate.set({
+					'hour': eventStart.get('hour'),
+					'minute': eventStart.get('minute'),
+					'second': eventStart.get('second')
+				})
+				// 避免初始重复渲染
+				if ( !newEventStartDate.isSame( eventStart ) ) dayArray.push( moment(newEventStartDate) );
+				// 隔多少周重复
+				curWeekDay += 7*intervalWeeks;
+				//console.log( moment(newEventStartDate).format('YYYY-MM-DD HH:mm:ss') );
+			} while ( moment(viewStart).day(curWeekDay + 7 ).isBefore( viewEnd ) )
+			
+		}
+		
+		return dayArray;
+	}
 
 	toFullCalendarEvent() {
 		// 注意方法返回的只是FullCalendarEvent的数据类型，并不是event对象
 		const that = this;
 		const newEvent = {};
 		const keys = Object.keys(this);
+		// 去除非必要属性
 		keys.splice( keys.findIndex( (i) => i == '_Info' ), 1);
 		keys.splice( keys.findIndex( (i) => i == '_ExtraInfo' ), 1);
+		// 浅拷贝, 不过主要属性都是基本数据类型，所以不存在引用问题
 		keys.forEach(function(item, index, arr){
 			newEvent[item] = that[item];
 		});
@@ -340,11 +475,6 @@ export default class CalendarEvent {
 		//TODO: 重数据库重新获取数据更新实例
 	};
 
-	renderEvent() {
-		// 看该事件是否已存在，如果存在则updateEvent
-		if (!g_cal) throw new Error('Can not find FullCalendar Widget.')
-	};
-
 	refreshEvent(event) {
 		//TODO: 应该自动遍历并修改属性
 		if ( event ) {
@@ -356,11 +486,6 @@ export default class CalendarEvent {
 			//用.fullCalendar( ‘clientEvents’ [, idOrFilter ] ) -> Array 获取源数据从而更新
 			//TODO: 遍历并寻找GUID匹配的事件
 		}
-	}
-
-	static refreshEventSources() {
-		//TODO: 将FullCalendar所有Sources删除，重新添加
-		// 没点击一个视图更新时就执行
 	}
 
 }

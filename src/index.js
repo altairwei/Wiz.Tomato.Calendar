@@ -65,7 +65,7 @@ $(function(){
 		nowIndicator: true,
 		forceEventDuration: true,
 		firstDay: 1, // 第一天是周一还是周天，与datepicker必须相同
-		dragOpacity:{
+		dragOpacity: {
 			"month": .5,
 			"agendaWeek": 1,
 			"agendaDay": 1
@@ -77,7 +77,6 @@ $(function(){
 			//TODO: 感觉这样造成性能上的损失，是否有更好的方法？
 			const calendar = $('#calendar');
 			const eventSources = dataLoader.getEventSources( view, element );
-			console.log(eventSources);
 			calendar.fullCalendar('removeEvents');
 			for (let i=0 ; i < eventSources.length; i++) {
 				calendar.fullCalendar('addEventSource', eventSources[i]);
@@ -95,6 +94,9 @@ $(function(){
 			window.g_createModal.update({start, end, jsEvent, view});
 			window.g_createModal.show();
 		},
+
+		eventDragStart: function( event, jsEvent, ui, view ) { },
+		eventDragStop: function( event, jsEvent, ui, view ) { },
 
 		// 日历事件拖动 event, delta, revertFunc, jsEvent, ui, view
 		eventDrop: function(event, delta, revertFunc, jsEvent, ui, view){
