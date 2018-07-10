@@ -61,7 +61,7 @@ export default class EventEditModal extends EventModal {
 				node: '#tc-editpage-finish',
 				eventName: 'click',
 				handle: () => {
-					formHandles.onCompleteBtnClick(event);
+					new FormHandles().onCompleteBtnClick(event);
 					that.hide();
 				}
 			},
@@ -78,6 +78,14 @@ export default class EventEditModal extends EventModal {
                 eventName: 'click',
                 handle: () => {
                     new FormHandles().onDeleteDocBtnClick(event);
+                    that.hide()
+                }
+            },
+            {
+                node: '#tc-editpage-editorigin',
+                eventName: 'click',
+                handle: () => {
+                    new FormHandles().onEditOriginBtnClick(event);
                     that.hide()
                 }
             }
@@ -131,15 +139,23 @@ export default class EventEditModal extends EventModal {
                     </div>
                     <div class="modal-footer">
                     <div class='row' style='text-align: left;'>
-                        <div class='col-md-6'>
+                        <div class='col-md-7'>
                         <div id="tc-editpage-buttongroup" class="btn-group" role="group">
                             <button id='tc-editpage-save' class="btn btn-danger" type="button" disabled>保存</button>
                             <button id='tc-editpage-finish' class="btn btn-default" type="button">完成</button>
                             <button id='tc-editpage-delete' class="btn btn-default" type="button">删除</button>
                             <button id='tc-editpage-deleteEventDoc' class="btn btn-default" type="button">删除源文档</button>
+                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-right">
+                                <li>
+                                    <a id='tc-editpage-editorigin' href='javascript:void(0);'>编辑源数据</a>
+                                </li>
+                            </ul>
                         </div>
                         </div>
-                        <div class='col-md-2 col-md-offset-4' style='text-align: right;'>
+                        <div class='col-md-2 col-md-offset-3' style='text-align: right;'>
                         <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
                         </div>
                     </div>

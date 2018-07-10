@@ -247,44 +247,32 @@ export default class CalendarEvent {
 		*/
 		const rptRule = this.rptRule;
 		let dayArray;
-		console.log(rptRule)
-		if (/^Every(|\d)Week(|day)(\d*)$/.test(rptRule) ) {
+		console.count(rptRule);
+		if ( /^Every(\d)?Weeks?(\d*)$/.test(rptRule) ) {
 			// 每[1234]周[7123456]
-			const results = /^Every(|\d)Week(|day)(\d*)$/.exec(rptRule);
-			const interWeek = results[1]
-			const number = results[3];
+			const curWeekDay = moment(this.start).day();
+			const results = /^Every(\d)?Weeks?(\d*)$/.exec(rptRule);
+			const interWeek = results[1];
+			const number = results[2] || `${curWeekDay}`;
 			dayArray = this._getWeeklyRepeatDay(number, start, end, interWeek);
-		} else if ( /^EveryWeek|EveryWeekday$/.test(rptRule) ) {
+		} else if ( /^EveryWeek|EveryWeekday(\d*)$/.test(rptRule) ) {
 			// 每个工作日
-			dayArray = this._getWeeklyRepeatDay('12345', start, end);
+			const results = /^EveryWeekday(\d*)$/.exec(rptRule);
+			const number = results[1] || '12345';
+			dayArray = this._getWeeklyRepeatDay(number, start, end);
 		} else if ( "Daily" == rptRule ) {
+			// 每天
 			dayArray = this._getWeeklyRepeatDay('0123456', start, end);
 		} else if ( "Weekly" == rptRule ) {
+			// 每周
 			const curWeekDay = moment(this.start).day();
 			dayArray = this._getWeeklyRepeatDay(`${curWeekDay}`, start, end);
+		} else if ( "Monthly" == rptRule ) {
+			
 		}
 		//TODO: 完成剩下的重复规则
 		/*
 		switch ( true ){
-				// 每天，固定间隔
-				case "Daily":
-					getWeeklyRepeatDay(dayArray, [1, 2, 3, 4, 5, 6, 7]);
-					break;
-				// 每周，固定间隔
-				case "Weekly":
-					getWeeklyRepeatDay(dayArray, [eventStart.getDay()]);
-					break;
-				// 每两周，固定间隔
-				case "Every2Weeks":
-					getWeeklyRepeatDay(dayArray, [eventStart.getDay()]);
-					for (var i = 0; i < dayArray.length; ++ i){
-						var inter = _interDays(_d2s(eventStart), _d2s(dayArray[i][0]));
-						if ((parseFloat((inter-1)/7.0) % 2) != 0 ){
-							dayArray.splice(i, 1);
-							i --;
-						}
-					}
-					break;
 				// 每月
 				case "Monthly":
 					getMonthlyRepeatDay(dayArray);
