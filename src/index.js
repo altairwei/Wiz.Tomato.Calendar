@@ -5,6 +5,8 @@ import WizEventDataLoader from './WizEventDataLoader';
 import { renderEditPopper } from './Widget/EventPopover/EventPopover';
 import EventCreateModal from './Modal/EventCreateModal'
 import './index.css';
+import { WizShell } from './WizInterface';
+window.WizShell = WizShell;
 
 $(function(){
     // 定义变量
