@@ -2,8 +2,6 @@ import $ from 'jquery';
 import 'moment';
 import 'bootstrap/js/collapse';
 import 'bootstrap/js/transition';
-import 'bootstrap/dist/css/bootstrap.css';
-import 'bootstrap/dist/css/bootstrap-theme.css';
 import 'eonasdan-bootstrap-datetimepicker';
 import 'eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css';
 

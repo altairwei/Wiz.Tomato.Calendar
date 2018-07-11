@@ -1,7 +1,5 @@
 import $ from 'jquery';
 import 'jquery-ui/ui/widget';
-import 'bootstrap/dist/css/bootstrap.css';
-import 'bootstrap/dist/css/bootstrap-theme.css';
 import 'bootstrap/js/dropdown';
 import '@fortawesome/fontawesome-free/js/all';
 import Popper from 'popper.js';
@@ -48,6 +46,7 @@ $.widget("tc.EventPopover", {
 					</button>
 					<ul class="dropdown-menu dropdown-menu-right">
 						<li>
+							<a id='tc-editpopper-openEventDoc' href='javascript:void(0);'>打开源文档</a>
 							<a id='tc-editpopper-deleteEventDoc' href='javascript:void(0);'>删除源文档</a>
 						</li>
 					</ul>
@@ -162,6 +161,13 @@ $.widget("tc.EventPopover", {
 				handle: () => {
 					formHandles.onDeleteDocBtnClick(event);
 					that.hide();
+				}
+			},
+			{
+				node: '#tc-editpopper-openEventDoc',
+				eventName: 'click',
+				handle: () => {
+					formHandles.onOpenDocBtnClick(event);
 				}
 			}
 		])

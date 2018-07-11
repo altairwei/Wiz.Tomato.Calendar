@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import WizEventDataLoader from '../WizEventDataLoader';
 import CalendarEvent from '../CalendarEvent';
-import { WizConfirm, WizCommonUI as g_cmn, WizDatabase as g_db } from '../WizInterface';
+import { WizConfirm, WizCommonUI as objCommon, WizDatabase as objDatabase, WizExplorerWindow as objWindow } from '../WizInterface';
 
 const g_cal = $('#calendar');
 
@@ -66,8 +66,13 @@ export default class FormHandles {
     };
 
     onEditOriginBtnClick(event) {
-        const doc = g_db.DocumentFromGUID(event.id);
-        g_cmn.EditCalendarEvent(doc);
+        const doc = objDatabase.DocumentFromGUID(event.id);
+        objCommon.EditCalendarEvent(doc);
+    };
+
+    onOpenDocBtnClick(event) {
+        const doc = objDatabase.DocumentFromGUID(event.id);
+        objWindow.ViewDocument(doc, true);
     }
 
 }

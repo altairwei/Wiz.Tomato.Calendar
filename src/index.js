@@ -1,6 +1,8 @@
 import moment from 'moment';
 import 'fullcalendar';
 import 'fullcalendar/dist/fullcalendar.css';
+import 'bootstrap/dist/css/bootstrap.css';
+import 'bootstrap/dist/css/bootstrap-theme.css';
 import WizEventDataLoader from './WizEventDataLoader';
 import { renderEditPopper } from './Widget/EventPopover/EventPopover';
 import EventCreateModal from './Modal/EventCreateModal'
