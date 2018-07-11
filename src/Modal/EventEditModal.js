@@ -30,9 +30,26 @@ export default class EventEditModal extends EventModal {
             },
             {//所有输入框
                 node: 'input',
+                excludes: '#tc-editpage-isend',
                 eventName: 'change',
                 handle: () => that.modal.find('#tc-editpage-save').attr('disabled', false)
-            },
+            }
+        ]);
+
+        this.renderEditForm();
+        this.renderRepeatForm();
+        this.renderControlButtons();
+        
+    };
+
+    renderEditForm() {
+        const that = this;
+        const event = this.args.event;
+        if ( !this.editForm ) {
+            this.editForm = $(this.HtmlEditForm);
+            $(this.modal).find('#tc-editform').append( this.editForm );
+        } 
+        this.renderFormComponent(this.editForm, [
             {//标题
                 node: '#tc-editpage-eventtitle',
                 value: event.title,
@@ -58,7 +75,140 @@ export default class EventEditModal extends EventModal {
                     $(node).css('background-color', event.backgroundColor);
                     createColorPicker(node)
                 }
+            }
+        ])
+
+    }
+
+    get HtmlEditForm() {
+        return `
+            <form>
+                <div class="row">
+                <div class='form-group col-md-12'>
+                    <label for="tc-editpage-eventtitle" class="control-label">标题</label>
+                    <input type="text" class="form-control eventtitle" id="tc-editpage-eventtitle">
+                </div>
+                </div>
+                <div class="row">
+                <div class="form-group col-md-6">
+                    <label for="tc-editpage-eventstart" class="control-label">开始日期</label>
+                    <input type="text" class="form-control datetimepicker-input eventstart" id="tc-editpage-eventstart" data-toggle="datetimepicker" data-target="#tc-editpage-eventstart"/>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="tc-editpage-eventend" class="control-label">结束日期</label>
+                    <input type='text' class="form-control eventend" id='tc-editpage-eventend' />
+                </div>
+                </div>
+                <div class="row">
+                <div class="form-group col-md-6">
+                    <label for="tc-editpage-eventcolor" class="control-label">色彩</label>
+                    <input id="tc-editpage-eventcolor" class="form-control eventcolor" >
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="tc-editpage-eventtags" class="control-label">标签</label>
+                    <input id="tc-editpage-eventtags" class="form-control eventtags" >
+                </div>
+                </div>
+                <div class="row">
+                <div class='form-group col-md-12'>
+                    <label for="tc-editpage-eventremark" class="control-label">备注</label>
+                    <textarea class="form-control eventremark" id="tc-editpage-eventremark" rows="3"></textarea>
+                </div>
+                </div>
+            </form>
+        `
+    };
+
+    renderRepeatForm() {
+        const that = this;
+        const event = this.args.event;
+        if ( !this.repeatForm ) {
+            this.repeatForm = $(this.HtmlRepeatForm);
+            $(this.modal).find('#tc-repeatform').append( this.repeatForm );
+        };
+        this.renderFormComponent(this.repeatForm, [
+            {//开始范围
+                node: '#tc-editpage-rptstart',
+                value: event.start.format('YYYY-MM-DD')
             },
+            {//是否结束
+                node: '#tc-editpage-isend',
+                eventName: 'click',
+                handle: (node) => {
+                    const isEndCheckbox = this.repeatForm.find('#tc-editpage-isend');
+                    const rptEnd = this.repeatForm.find('#tc-editpage-rptend');
+                    if ( isEndCheckbox.get(0).checked ) {
+                        rptEnd.attr('readonly', false);
+                    } else {
+                        rptEnd.attr('readonly', true);
+                        rptEnd.val('');
+                    }
+                }
+            },
+            {//结束范围
+                node: '#tc-editpage-rptend',
+                renderer: (node) => $(node).val(''),
+                renderer: createDatetimePicker
+            }
+        ])
+    }
+
+    get HtmlRepeatForm() {
+        return `
+            <form class="form-horizontal">
+                <div class='form-group '>
+                    <label for="tc-editpage-rpttype" class="col-md-2 col-md-offset-1 control-label">重复类型</label>
+                    <div class="col-md-8">
+                        <select class="form-control">
+                            <option>每个星期几</option>
+                            <option>每周</option>
+                            <option>每月</option>
+                            <option>每年</option>
+                        </select>
+                    </div>
+                </div>
+                <div class='form-group '>
+                    <label for="tc-editpage-rptweekday" class="col-md-2 col-md-offset-1 control-label">重复星期</label>
+                    <div class="col-md-8">
+                        <div class="checkbox-inline"><label><input type="checkbox" class="rptweekday" value="1" disabled> 一</label></div>
+                        <div class="checkbox-inline"><label><input type="checkbox" class="rptweekday" value="2" disabled> 二</label></div>
+                        <div class="checkbox-inline"><label><input type="checkbox" class="rptweekday" value="3" disabled> 三</label></div>
+                        <div class="checkbox-inline"><label><input type="checkbox" class="rptweekday" value="4" disabled> 四</label></div>
+                        <div class="checkbox-inline"><label><input type="checkbox" class="rptweekday" value="5" disabled> 五</label></div>
+                        <div class="checkbox-inline"><label><input type="checkbox" class="rptweekday" value="6" disabled> 六</label></div>
+                        <div class="checkbox-inline"><label><input type="checkbox" class="rptweekday" value="7" disabled> 日</label></div>
+                    </div>
+                </div>
+                <div class='form-group '>
+                    <label for="tc-editpage-rptrange" class="col-md-2 col-md-offset-1 control-label">重复范围</label>
+                    <div class="col-md-8">
+                        <div class="input-group">
+                            <span class="input-group-addon">开始</span>
+                            <input type="text" id="tc-editpage-rptstart" class="form-control" readonly />
+                            <span class="input-group-addon" style="border-left: 0; border-right: 0;"><input id="tc-editpage-isend" type="checkbox" style="vertical-align: middle;"> 结束</span>
+                            <input type="text" id="tc-editpage-rptend" class="form-control" placeholder="从不结束" readonly />
+                        </div>
+                    </div>
+                </div>
+                <div class='form-group '>
+                    <label for="tc-editpage-rptrule" class="col-md-2 col-md-offset-1 control-label">重复规则</label>
+                    <div class="col-md-8">
+                        <input type="text" class="form-control eventtitle" id="tc-editpage-rptrule" readonly>
+                    </div>
+                </div>
+            </form>           
+        `
+    };
+
+    renderControlButtons() {
+        const that = this;
+        const event = this.args.event;
+        const formHandles = new FormHandles();
+        if ( !this.controlButtons ) {
+            this.controlButtons = $(this.HtmlControlButtons);
+            $(this.modal).find('.modal-footer').append( this.controlButtons );
+        }
+        this.renderFormComponent(this.controlButtons, [
             {//保存按钮
                 node: '#tc-editpage-save',
                 renderer: (node) => $(node).attr('disabled', true),
@@ -108,131 +258,61 @@ export default class EventEditModal extends EventModal {
                     that.hide();
                 }
             }
-        ])
-    };
+        ]);
+    }
 
-    get HtmlTemplate() {
+    get HtmlControlButtons() {
+        return `
+            <div class='row' style='text-align: left;'>
+                <div class='col-md-7'>
+                <div id="tc-editpage-buttongroup" class="btn-group" role="group">
+                    <button id='tc-editpage-save' class="btn btn-danger" type="button" disabled>保存</button>
+                    <button id='tc-editpage-finish' class="btn btn-default" type="button">完成</button>
+                    <button id='tc-editpage-delete' class="btn btn-default" type="button">删除</button>
+                    <button id='tc-editpage-deleteEventDoc' class="btn btn-default" type="button">删除源文档</button>
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-right">
+                        <li>
+                            <a id='tc-editpage-editorigin' href='javascript:void(0);'>编辑源数据</a>
+                            <a id='tc-editpage-openEventDoc' href='javascript:void(0);'>打开源文档</a>
+                        </li>
+                    </ul>
+                </div>
+                </div>
+                <div class='col-md-2 col-md-offset-3' style='text-align: right;'>
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </div>   
+        `
+    }
+
+    get HtmlModalTemplate() {
         return `
             <div class="modal fade" tabindex="-1" role="dialog" id='tc-EventEditModal'>
                 <div class="modal-dialog modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-header" style="border-bottom: none; padding: 0;">
-                        <ul class="nav nav-tabs" id="tc-editpage-tabs" role="tablist" style="padding: 15px 15px 0 15px;">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            <li role="presentation" class="active"><a href="#tc-editform" aria-controls="tc-editform" role="tab">日程编辑</a></li>
-                            <li role="presentation" ><a href="#tc-repeatform" aria-controls="tc-repeatform" role="tab">重复</a></li>
-                        </ul>
-                    </div> 
-                    <div class="modal-body">
-                    <div class="tab-content">
-                        <div role="tabpanel" class="tab-pane active" id="tc-editform">
-                            <form>
-                                <div class="row">
-                                <div class='form-group col-md-12'>
-                                    <label for="tc-editpage-eventtitle" class="control-label">标题</label>
-                                    <input type="text" class="form-control eventtitle" id="tc-editpage-eventtitle">
-                                </div>
-                                </div>
-                                <div class="row">
-                                <div class="form-group col-md-6">
-                                    <label for="tc-editpage-eventstart" class="control-label">开始日期</label>
-                                    <input type="text" class="form-control datetimepicker-input eventstart" id="tc-editpage-eventstart" data-toggle="datetimepicker" data-target="#tc-editpage-eventstart"/>
-                                </div>
-                                <div class="form-group col-md-6">
-                                    <label for="tc-editpage-eventend" class="control-label">结束日期</label>
-                                    <input type='text' class="form-control eventend" id='tc-editpage-eventend' />
-                                </div>
-                                </div>
-                                <div class="row">
-                                <div class="form-group col-md-6">
-                                    <label for="tc-editpage-eventcolor" class="control-label">色彩</label>
-                                    <input id="tc-editpage-eventcolor" class="form-control eventcolor" >
-                                </div>
-                                <div class="form-group col-md-6">
-                                    <label for="tc-editpage-eventtags" class="control-label">标签</label>
-                                    <input id="tc-editpage-eventtags" class="form-control eventtags" >
-                                </div>
-                                </div>
-                                <div class="row">
-                                <div class='form-group col-md-12'>
-                                    <label for="tc-editpage-eventremark" class="control-label">备注</label>
-                                    <textarea class="form-control eventremark" id="tc-editpage-eventremark" rows="3"></textarea>
-                                </div>
-                                </div>
-                            </form>                        
-                        </div>
-                        <div role="tabpanel" class="tab-pane" id="tc-repeatform">
-                            <form class="form-horizontal">
-                                <div class='form-group '>
-                                    <label for="tc-editpage-rpttype" class="col-md-2 col-md-offset-1 control-label">重复类型</label>
-                                    <div class="col-md-8">
-                                        <select class="form-control">
-                                            <option>每个星期几</option>
-                                            <option>每周</option>
-                                            <option>每月</option>
-                                            <option>每年</option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class='form-group '>
-                                    <label for="tc-editpage-rptweekday" class="col-md-2 col-md-offset-1 control-label">重复星期</label>
-                                    <div class="col-md-8">
-                                        <div class="checkbox-inline"><label><input type="checkbox" class="rptweekday" value="1"> 一</label></div>
-                                        <div class="checkbox-inline"><label><input type="checkbox" class="rptweekday" value="2"> 二</label></div>
-                                        <div class="checkbox-inline"><label><input type="checkbox" class="rptweekday" value="3"> 三</label></div>
-                                        <div class="checkbox-inline"><label><input type="checkbox" class="rptweekday" value="4"> 四</label></div>
-                                        <div class="checkbox-inline"><label><input type="checkbox" class="rptweekday" value="5"> 五</label></div>
-                                        <div class="checkbox-inline"><label><input type="checkbox" class="rptweekday" value="6"> 六</label></div>
-                                        <div class="checkbox-inline"><label><input type="checkbox" class="rptweekday" value="7"> 日</label></div>
-                                    </div>
-                                </div>
-                                <div class='form-group '>
-                                    <label for="tc-editpage-rptrange" class="col-md-2 col-md-offset-1 control-label">重复时间</label>
-                                    <div class="col-md-8">
-                                        <div class="input-group">
-                                            <span class="input-group-addon">开始</span>
-                                            <input type="text" class="form-control" readonly />
-                                            <span class="input-group-addon" style="border-left: 0; border-right: 0;"><input type="checkbox" style="vertical-align: middle;"> 结束</span>
-                                            <input type="text" class="form-control" readonly />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class='form-group '>
-                                    <label for="tc-editpage-rptrule" class="col-md-2 col-md-offset-1 control-label">重复规则</label>
-                                    <div class="col-md-8">
-                                        <input type="text" class="form-control eventtitle" id="tc-editpage-rptrule" readonly>
-                                    </div>
-                                </div>
-                            </form>     
-                        </div>
-                    </div>
-                    </div>
-                    <div class="modal-footer">
-                    <div class='row' style='text-align: left;'>
-                        <div class='col-md-7'>
-                        <div id="tc-editpage-buttongroup" class="btn-group" role="group">
-                            <button id='tc-editpage-save' class="btn btn-danger" type="button" disabled>保存</button>
-                            <button id='tc-editpage-finish' class="btn btn-default" type="button">完成</button>
-                            <button id='tc-editpage-delete' class="btn btn-default" type="button">删除</button>
-                            <button id='tc-editpage-deleteEventDoc' class="btn btn-default" type="button">删除源文档</button>
-                            <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="caret"></span>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-right">
-                                <li>
-                                    <a id='tc-editpage-editorigin' href='javascript:void(0);'>编辑源数据</a>
-                                    <a id='tc-editpage-openEventDoc' href='javascript:void(0);'>打开源文档</a>
-                                </li>
+                    <div class="modal-content">
+                        <!-- 头部 -->
+                        <div class="modal-header" style="border-bottom: none; padding: 0;">
+                            <!-- 标签页链接 -->
+                            <ul class="nav nav-tabs" id="tc-editpage-tabs" role="tablist" style="padding: 15px 15px 0 15px;">
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                <li role="presentation" class="active"><a href="#tc-editform" aria-controls="tc-editform" role="tab">日程编辑</a></li>
+                                <li role="presentation" ><a href="#tc-repeatform" aria-controls="tc-repeatform" role="tab">重复</a></li>
                             </ul>
+                        </div> 
+                        <!-- 主体 -->
+                        <div class="modal-body">
+                            <!-- 标签页内容 -->
+                            <div class="tab-content">
+                                <div role="tabpanel" class="tab-pane active" id="tc-editform"></div>
+                                <div role="tabpanel" class="tab-pane" id="tc-repeatform"></div>
+                            </div>
                         </div>
-                        </div>
-                        <div class='col-md-2 col-md-offset-3' style='text-align: right;'>
-                        <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
-                        </div>
+                        <!-- 尾部 -->
+                        <div class="modal-footer"></div>
                     </div>
-
-                    </div>
-                </div>
                 </div>
             </div>
         `

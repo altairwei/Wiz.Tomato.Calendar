@@ -55,7 +55,7 @@ export default class EventCreateModal extends EventModal {
         ]);
     };
 
-    get HtmlTemplate() {
+    get HtmlModalTemplate() {
         return `
             <div class="modal fade" tabindex="-1" role="dialog" id="tc-EventCreateModal" aria-labelledby="tc-createpage-dialogtitle">
                 <div class="modal-dialog modal-dialog-centered" role="document">

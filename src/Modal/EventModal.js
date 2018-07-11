@@ -5,7 +5,7 @@ export default class EventModal {
 
     constructor(args) {
         this.args = args;
-        const html = this.HtmlTemplate;
+        const html = this.HtmlModalTemplate;
         this.modal = $(html).modal({
             show: false
         });
@@ -28,7 +28,7 @@ export default class EventModal {
     /**
      * 写入HTML模板.
      */
-    get HtmlTemplate() {
+    get HtmlModalTemplate() {
         return `
             <div class="modal fade" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document">
@@ -60,6 +60,7 @@ export default class EventModal {
      * @param {string|HTMLElement} modalNode - 表单或包含表单的块元素|CSS选择器.
      * @param {Object[]} tasks - 任务列表.
      * @param {string} tasks[].node - CSS选择器.
+     * @param {string} tasks[].excludes - 排除掉某些元素.
      * @param {string} tasks[].value - 需要填入的值.
      * @param {Function} tasks[].renderer - 组件渲染器.
      * @param {string} tasks[].eventName - 事件名称.
@@ -67,7 +68,7 @@ export default class EventModal {
      */
     renderFormComponent(modalNode, tasks) {
         for (let task of tasks) {
-            let $comps = $(modalNode).get(0) == $(task.node).get(0) ? $(task.node) : $(modalNode).find(task.node);
+            let $comps = $(modalNode).get(0) == $(task.node).get(0) ? $(task.node) : $(modalNode).find(task.node).not(task.excludes);
             // 渲染组件
             if ( task.value ) $comps.val(task.value);
             if ( typeof task.renderer == 'function' ) task.renderer($comps);
