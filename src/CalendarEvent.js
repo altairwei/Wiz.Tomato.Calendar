@@ -233,71 +233,32 @@ export default class CalendarEvent {
      * @returns {Object[]} 包含一系列`Moment`日期对象的数组.
      */
 	_getRenderRepeatDay(start, end) {
-		/*
-		const rptRule = {
-			"Daily": "Daily", //每日
-			"EveryWeekday": "EveryWeekday135", //每个工作日135
-			"EveryWeek": "EveryWeek7123456", //每周 日一二三四五六
-			"Every2Weeks" : "Every2Weeks", //每两周
-			"Monthly": "Monthly", //每月
-			"Yearly": "Yearly", //每年
-			"ChineseMonthly": "ChineseMonthly", //农历每月
-			"ChineseYearly": "ChineseYearly", //农历每年
-		};
-		*/
 		const rptRule = this.rptRule;
 		let dayArray;
+		let regex;
 		console.count(rptRule);
-		if ( /^Every(\d)?Weeks?(\d*)$/.test(rptRule) ) {
+		if ( (regex = /^Every(\d)?Weeks?(\d*)$/).test(rptRule) ) {
 			// 每[1234]周[7123456]
 			const curWeekDay = moment(this.start).day();
-			const results = /^Every(\d)?Weeks?(\d*)$/.exec(rptRule);
+			const results = regex.exec(rptRule);
 			const interWeek = results[1];
 			const number = results[2] || `${curWeekDay}`;
 			dayArray = this._getWeeklyRepeatDay(number, start, end, interWeek);
-		} else if ( /^EveryWeek|EveryWeekday(\d*)$/.test(rptRule) ) {
-			// 每个工作日
-			const results = /^EveryWeekday(\d*)$/.exec(rptRule);
+
+		} else if ( (regex = /^EveryWeekday(\d*)$/).test(rptRule) ) {
+			// 每个工作日EveryWeekday135
+			const results = regex.exec(rptRule);
 			const number = results[1] || '12345';
 			dayArray = this._getWeeklyRepeatDay(number, start, end);
-		} else if ( "Daily" == rptRule ) {
-			// 每天
-			dayArray = this._getWeeklyRepeatDay('0123456', start, end);
-		} else if ( "Weekly" == rptRule ) {
-			// 每周
-			const curWeekDay = moment(this.start).day();
-			dayArray = this._getWeeklyRepeatDay(`${curWeekDay}`, start, end);
-		} else if ( "Monthly" == rptRule ) {
-			
+
+		} else if ( (regex = /(Daily|Weekly|Monthly|Yearly)/).test(rptRule) ) {
+			// Daily|Weekly|Monthly|Yearly
+			const perRule = regex.exec(rptRule)[1]
+			dayArray = this._getPerRepeatDays(start, end, perRule);
+
 		}
-		//TODO: 完成剩下的重复规则
-		/*
-		switch ( true ){
-				// 每月
-				case "Monthly":
-					getMonthlyRepeatDay(dayArray);
-					break;
-				// 每年
-				case "Yearly":
-					getYearlyRepeatDay(dayArray);
-					break;
-				// TODO: 汉字需要考虑
-				case "ChineseMonthly":
-					getChineseRepeatDay(dayArray, '月');
-					break;
-				case "ChineseYearly":
-					getChineseRepeatDay(dayArray, '历');
-					break;
-				default:{
-					if (g_repeatRule.indexOf("EveryWeek") == 0){
-						var days = g_repeatRule.substr("EveryWeek".length).split('');
-						getWeeklyRepeatDay(dayArray, days);
-					}
-				}
-				
-			}
-			*/
-			return dayArray;
+
+		return dayArray;
 	};
 
 	/**
@@ -335,6 +296,26 @@ export default class CalendarEvent {
 			
 		}
 		
+		return dayArray;
+	};
+
+	_getPerRepeatDays(start, end, perRule) {
+		const perRuleMap = {
+			'Daily': 'days',
+			'Weekly' : 'weeks',
+			'Monthly' : 'months',
+			'Yearly' : 'years'
+		};
+		const viewStart = moment(this.start);
+		const viewEnd = moment(end);
+		let dayArray = [];
+		const eventStart = moment(this.start)
+		do {
+			// 增加一个月
+			eventStart.add(1, perRuleMap[perRule]);
+			dayArray.push( moment(eventStart) );
+		} while ( eventStart.isBefore( viewEnd ) );
+
 		return dayArray;
 	}
 

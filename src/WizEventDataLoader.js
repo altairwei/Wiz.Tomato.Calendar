@@ -61,6 +61,7 @@ export default class WizEventDataLoader {
 		if (objDatabase.DocumentsDataFromSQL) {
 			try {
 				const data = objDatabase.DocumentsDataFromSQL(sql);
+				if ( !data ) return false;
 				const obj = JSON.parse(data);
 				if ( !obj || !Array.isArray(obj) ) return false;
 				for (let i = 0; i < obj.length; i ++) {
