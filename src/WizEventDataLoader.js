@@ -108,6 +108,7 @@ export default class WizEventDataLoader {
 					"DOCUMENT_GUID in (select DOCUMENT_GUID from WIZ_DOCUMENT_PARAM where PARAM_NAME='CALENDAR_RECURRENCE')";
 
 		const data = objDatabase.DocumentsDataFromSQL(sql);
+		console.log(data)
 		if ( !data ) return false;
 		
 		const obj = JSON.parse(data);

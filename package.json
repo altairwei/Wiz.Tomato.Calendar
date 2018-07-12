@@ -35,6 +35,7 @@
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.1.0",
     "bootstrap": "^3.3.7",
+    "bootstrap-select": "^1.13.1",
     "eonasdan-bootstrap-datetimepicker": "^4.17.47",
     "fullcalendar": "^3.9.0",
     "huebee": "^2.0.0",

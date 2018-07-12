@@ -4,6 +4,7 @@ import 'bootstrap/js/tab';
 import FormHandles from '../Utils/FormHandles';
 import { createDatetimePicker } from '../Widget/DateTimePicker';
 import { createColorPicker } from '../Widget/ColorPicker';
+import { createBootstrapSelect } from '../Widget/BootstrapSelect'
 import EventModal from './EventModal';
 
 export default class EventEditModal extends EventModal {
@@ -127,6 +128,18 @@ export default class EventEditModal extends EventModal {
             $(this.modal).find('#tc-repeatform').append( this.repeatForm );
         };
         this.renderFormComponent(this.repeatForm, [
+            {//重复规则
+                node: '#tc-editpage-rptrule',
+                renderer: createBootstrapSelect,
+                eventName: 'changed.bs.select',
+                handle: (e, clickedIndex, newValue, oldValue) => {
+                    if ( clickedIndex == 4 ) {
+                        $('.rptweekday').attr('disabled', false);
+                    } else {
+                        $('.rptweekday').prop("checked", false).attr('disabled', true);
+                    }
+                }
+            },
             {//开始范围
                 node: '#tc-editpage-rptstart',
                 value: event.start.format('YYYY-MM-DD')
@@ -159,11 +172,18 @@ export default class EventEditModal extends EventModal {
                 <div class='form-group '>
                     <label for="tc-editpage-rpttype" class="col-md-2 col-md-offset-1 control-label">重复类型</label>
                     <div class="col-md-8">
-                        <select class="form-control">
-                            <option>每个星期几</option>
-                            <option>每周</option>
-                            <option>每月</option>
-                            <option>每年</option>
+                        <select class="" id="tc-editpage-rptrule">
+                            <optgroup label="简单规则">
+                                <option value="Daily">每日</option>
+                                <option value="Weekly">每周</option>
+                                <option value="Monthly">每月</option>
+                                <option value="Yearly">每年</option>
+                            </optgroup>
+                            <optgroup label="复合规则">
+                                <option value="EveryWeek">每一个星期几</option>
+                                <option value="Every2Week">每两个星期几</option>
+                                <option value="EveryWeekday">每个工作日</option>
+                            </optgroup>
                         </select>
                     </div>
                 </div>

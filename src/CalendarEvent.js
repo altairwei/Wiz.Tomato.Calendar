@@ -27,6 +27,8 @@ export default class CalendarEvent {
 						"CALENDAR_INFO" : doc.GetParamValue('CALENDAR_INFO'),
 						"CALENDAR_EXTRAINFO" : doc.GetParamValue('CALENDAR_EXTRAINFO'),
 						"CALENDAR_START" : doc.GetParamValue('CALENDAR_START'),
+						"CALENDAR_RECURRENCE" : doc.GetParamValue('CALENDAR_RECURRENCE'),
+						"CALENDAR_ENDRECURRENCE" : doc.GetParamValue('CALENDAR_ENDRECURRENCE'),
 						"created" : moment(doc.DateCreated).format('YYYY-MM-DD HH:mm:ss'),
 						"guid" : doc.GUID,
 						"title" : doc.Title,
@@ -39,7 +41,7 @@ export default class CalendarEvent {
 	};
 
 	_create(data, type) {
-		let start, end, id, bkColor, allDay, complete, dateCompleted, rptRule;
+		let start, end, id, bkColor, allDay, complete, dateCompleted, rptRule, rptEnd;
 		switch (type) {
 			case "GUID":
 			case "WizEvent":
@@ -54,7 +56,9 @@ export default class CalendarEvent {
 				allDay = data.CALENDAR_END.indexOf("23:59:59") != -1 ? true : false;
 				complete = this._ExtraInfo.Complete;
 				dateCompleted = this._ExtraInfo.DateCompleted;
+				// 重复事件
 				rptRule = data.CALENDAR_RECURRENCE;
+				rptEnd = data.CALENDAR_ENDRECURRENCE;
 				break;
 			case "FullCalendarEvent":
 				id = data.id;
@@ -65,6 +69,7 @@ export default class CalendarEvent {
 				complete = data.complete || 0;
 				dateCompleted = data.dateCompleted || '';
 				rptRule = data.rptRule;
+				rptEnd = data.rptEnd
 				break;
 			default:
 				throw new Error('Can not identify data type.');
@@ -85,7 +90,9 @@ export default class CalendarEvent {
 		this.backgroundColor = bkColor;
 		this.complete = complete;
 		this.dateCompleted = dateCompleted;
+		// 重复事件
 		this.rptRule = rptRule;
+		this.rptEnd = rptEnd;
 		//
 		this._update();
 	}
@@ -271,12 +278,13 @@ export default class CalendarEvent {
 		//考虑渲染范围，以及结束循环的日期
 		const viewStart = moment(this.start);
 		const viewEnd = moment(end);
+		const rptEnd = this.rptEnd ? moment(this.rptEnd) : viewEnd;
 		let dayArray = [];
 		const intervalWeeks = interWeeks ? parseInt(interWeeks) : 1;
 		const weekdays = number.replace('7', '0').split(''); //周日0~6周六
 		for ( let day of weekdays ) {
 			//
-			let curWeekDay = parseInt(day), newEventStartDate = moment(viewStart)
+			let curWeekDay = parseInt(day), newEventStartDate = moment(viewStart);
 			do {
 				// 创建新Moment对象
 				newEventStartDate = moment(viewStart).day(curWeekDay);
@@ -292,7 +300,8 @@ export default class CalendarEvent {
 				// 隔多少周重复
 				curWeekDay += 7*intervalWeeks;
 				//console.log( moment(newEventStartDate).format('YYYY-MM-DD HH:mm:ss') );
-			} while ( moment(viewStart).day(curWeekDay + 7 ).isBefore( viewEnd ) )
+			} while ( moment(viewStart).day(curWeekDay + 7 ).isBefore( viewEnd ) 
+						&& moment(viewStart).day(curWeekDay + 7 ).isBefore( rptEnd )  )
 			
 		}
 		
@@ -308,13 +317,14 @@ export default class CalendarEvent {
 		};
 		const viewStart = moment(this.start);
 		const viewEnd = moment(end);
+		const rptEnd = this.rptEnd ? moment(this.rptEnd) : viewEnd;
 		let dayArray = [];
 		const eventStart = moment(this.start)
 		do {
 			// 增加一个月
 			eventStart.add(1, perRuleMap[perRule]);
 			dayArray.push( moment(eventStart) );
-		} while ( eventStart.isBefore( viewEnd ) );
+		} while ( eventStart.isBefore( viewEnd ) && eventStart.isBefore( rptEnd ) );
 
 		return dayArray;
 	}
