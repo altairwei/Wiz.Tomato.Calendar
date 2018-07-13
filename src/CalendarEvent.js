@@ -258,9 +258,9 @@ export default class CalendarEvent {
 			const number = results[1] || '12345';
 			dayArray = this._getWeeklyRepeatDay(number, start, end);
 
-		} else if ( (regex = /(Daily|Weekly|Monthly|Yearly)/).test(rptRule) ) {
+		} else if ( (regex = /Daily|Weekly|Monthly|Yearly/).test(rptRule) ) {
 			// Daily|Weekly|Monthly|Yearly
-			const perRule = regex.exec(rptRule)[1]
+			const perRule = regex.exec(rptRule)[0]
 			dayArray = this._getPerRepeatDays(start, end, perRule);
 
 		}

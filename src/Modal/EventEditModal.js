@@ -23,6 +23,8 @@ export default class EventEditModal extends EventModal {
             {//渲染tabs
                 node: '#tc-editpage-tabs a',
                 renderer: (node) => {
+                    // 显示默认标签页
+                    this.modal.find('#tc-editpage-tabs a:first').tab('show');
                     $(node).click(function(e) {
                         e.preventDefault();
                         $(this).tab('show');
@@ -130,11 +132,46 @@ export default class EventEditModal extends EventModal {
         this.renderFormComponent(this.repeatForm, [
             {//重复规则
                 node: '#tc-editpage-rptrule',
-                renderer: createBootstrapSelect,
+                renderer: (node) => {
+                    // 渲染重复规则选择组件
+                    createBootstrapSelect(node);
+                    // 判断重复规则并设置UI
+                    let rptRegexArray = this._checkRptType(event.rptRule);
+                    if (!rptRegexArray) rptRegexArray = [];
+                    if ( rptRegexArray.length == 3 ) {
+                        // 判断为 EveryWeek
+                        this.repeatForm.find(node).selectpicker('val', `Every${rptRegexArray[1]}Week`);
+                        const weekDays = rptRegexArray[2].split('');
+                        for (let day of weekDays) {
+                            this.repeatForm.find('.rptweekday').attr('disabled', false);
+                            this.repeatForm.find(`.rptweekday[value='${day}']`).prop("checked", true);
+                        }
+                    } else if ( rptRegexArray.length == 2 ) {
+                        // 判断为EveryWeekday135等
+                        this.repeatForm.find(node).selectpicker('val', `EveryWeekday`);
+                        const weekDays = rptRegexArray[1].split('');
+                        for (let day of weekDays) {
+                            this.repeatForm.find(`.rptweekday`).not(`.rptweekday[value='6']`).not(`.rptweekday[value='7']`).attr('disabled', false);
+                            this.repeatForm.find(`.rptweekday[value='${day}']`).prop("checked", true);
+                        }
+
+                    } else if ( rptRegexArray.length == 1 ) {
+                        // 判断为简单 Daily,weekly等
+                        this.repeatForm.find(node).selectpicker('val', event.rptRule);
+                    } else {
+                        this.repeatForm.find(node).selectpicker('val', 'none');
+                        this.repeatForm.find('.rptweekday').prop("checked", false).attr('disabled', true);
+                    }
+                    
+                } ,
                 eventName: 'changed.bs.select',
                 handle: (e, clickedIndex, newValue, oldValue) => {
-                    if ( clickedIndex == 4 ) {
+                    if ( clickedIndex == 5 || clickedIndex == 6 ) {
+                        // EveryWeek
                         $('.rptweekday').attr('disabled', false);
+                    } else if ( clickedIndex == 7 ) {
+                        // EveryWeekday
+                        this.repeatForm.find(`.rptweekday`).not(`.rptweekday[value='6']`).not(`.rptweekday[value='7']`).attr('disabled', false);
                     } else {
                         $('.rptweekday').prop("checked", false).attr('disabled', true);
                     }
@@ -166,6 +203,17 @@ export default class EventEditModal extends EventModal {
         ])
     }
 
+    _checkRptType(rptRule) {
+        let regex;
+		if ( (regex = /^Every(\d)?Weeks?(\d*)$/).test(rptRule) ) {
+            return regex.exec(rptRule);
+		} else if ( (regex = /^EveryWeekday(\d*)$/).test(rptRule) ) {
+            return regex.exec(rptRule);
+		} else if ( (regex = /Daily|Weekly|Monthly|Yearly/).test(rptRule) ) {
+            return regex.exec(rptRule);
+		}
+    }
+
     get HtmlRepeatForm() {
         return `
             <form class="form-horizontal">
@@ -173,6 +221,7 @@ export default class EventEditModal extends EventModal {
                     <label for="tc-editpage-rpttype" class="col-md-2 col-md-offset-1 control-label">重复类型</label>
                     <div class="col-md-8">
                         <select class="" id="tc-editpage-rptrule">
+                            <option value="none">不重复</option>
                             <optgroup label="简单规则">
                                 <option value="Daily">每日</option>
                                 <option value="Weekly">每周</option>
