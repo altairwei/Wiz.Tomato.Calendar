@@ -1,14 +1,3 @@
-export { 
-    WizExplorerApp, 
-    WizExplorerWindow, 
-    WizDatabase, 
-    WizCommonUI, 
-    WizConfirm, 
-    WizAlert, 
-    WizBubbleMessage, 
-    WizShell 
-};
-
 //TODO: 判断window.external是否为WizHtmlEditorApp
 const WizExplorerApp = window.external;
 const WizExplorerWindow = WizExplorerApp.Window;
@@ -61,3 +50,14 @@ class WizShell {
         }
     }
 }
+
+export { 
+    WizExplorerApp, 
+    WizExplorerWindow, 
+    WizDatabase, 
+    WizCommonUI, 
+    WizConfirm, 
+    WizAlert, 
+    WizBubbleMessage, 
+    WizShell 
+};

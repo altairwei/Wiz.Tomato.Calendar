@@ -1,4 +1,4 @@
-import { WizDatabase as objDatabase } from '../WizInterface';
+import { WizDatabase as objDatabase } from '../utils/WizInterface';
 import CalendarEvent from './CalendarEvent';
 
 /* 数据获取

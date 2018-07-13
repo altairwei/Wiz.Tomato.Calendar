@@ -1,9 +1,7 @@
 import moment from 'moment';
 import 'fullcalendar';
-import { WizDatabase as g_db, WizCommonUI as g_cmn} from '../WizInterface';
-import Config from '../Config';
-
-const g_cal = $('#calendar');
+import { WizDatabase as g_db, WizCommonUI as g_cmn} from '../utils/WizInterface';
+import Config from '../utils/Config';
 
 export default class CalendarEvent {
 	/**
@@ -360,8 +358,7 @@ export default class CalendarEvent {
 
 	addToFullCalendar() {
 		//TODO: 将自身添加到FullCalendar
-		if (!g_cal) throw new Error('Can not find FullCalendar Widget.')
-		g_cal.fullCalendar( 'addEventSource', {
+		$('#calendar').fullCalendar( 'addEventSource', {
 			events: [
 				this.toFullCalendarEvent()
 			]
@@ -439,11 +436,10 @@ export default class CalendarEvent {
 	};
 
 	deleteEventData( isDeleteDoc = false ){
-		if (!g_cal) throw new Error('Can not find FullCalendar Widget.')
 		let doc = g_db.DocumentFromGUID(this.id);
 		if (!doc) throw new Error('Can not find Event related WizDocument.')
 		// 移除FullCalendar事件
-		g_cal.fullCalendar('removeEvents', this.id);
+		$('#calendar').fullCalendar('removeEvents', this.id);
 		// 移除日历数据
 		doc.RemoveFromCalendar();
 		// 删除文档
@@ -460,7 +456,7 @@ export default class CalendarEvent {
 			// 重新渲染FullCalendar事件
 			event.title = this.title;
 			event.backgroundColor = this.backgroundColor;
-			g_cal.fullCalendar('updateEvent', event);
+			$('#calendar').fullCalendar('updateEvent', event);
 		} else {
 			//用.fullCalendar( ‘clientEvents’ [, idOrFilter ] ) -> Array 获取源数据从而更新
 			//TODO: 遍历并寻找GUID匹配的事件
