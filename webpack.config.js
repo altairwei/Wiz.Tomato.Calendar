@@ -5,7 +5,7 @@ const webpack = require('webpack');
 
 module.exports = {
   entry: {
-    app: './src/index.js',
+    index: './src/index.js',
   },
   devtool: 'inline-source-map',
   devServer: {
@@ -14,6 +14,14 @@ module.exports = {
   },
   module: {
     rules: [
+      {
+        test: /\.js$/, 
+        exclude: /node_modules/, 
+        loader: "babel-loader",
+        query: {
+          presets: ['es2015','react']
+        }
+      },
       {
         test: /\.css$/,
         use: ['style-loader', 'css-loader']
@@ -44,7 +52,7 @@ module.exports = {
     new HtmlWebpackPlugin({
       title: '番茄日历',
       template: './src/index.html',
-      chunks: ['app', 'vendor']
+      chunks: ['index', 'vendor']
     }),
     new webpack.NamedModulesPlugin(),
     new webpack.HotModuleReplacementPlugin(),

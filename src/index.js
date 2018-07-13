@@ -1,15 +1,14 @@
-import moment from 'moment';
-import 'fullcalendar';
-import 'fullcalendar/dist/fullcalendar.css';
+import React from 'react';
+import ReactDOM from 'react-dom';
+import 'fullcalendar-reactwrapper/dist/css/fullcalendar.min.css'
 import 'bootstrap/dist/css/bootstrap.css';
 import 'bootstrap/dist/css/bootstrap-theme.css';
-import WizEventDataLoader from './WizEventDataLoader';
-import { renderEditPopper } from './Widget/EventPopover/EventPopover';
-import EventCreateModal from './Modal/EventCreateModal'
+import App from './App';
 import './index.css';
-import { WizShell } from './WizInterface';
-window.WizShell = WizShell;
 
+ReactDOM.render(<App />, document.getElementById('root'));
+
+/*
 $(function(){
     // 定义变量
 	const dataLoader = new WizEventDataLoader();
@@ -158,3 +157,4 @@ $(function(){
 		
 	})
 })
+*/
