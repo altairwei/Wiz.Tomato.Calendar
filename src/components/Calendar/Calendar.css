@@ -1,0 +1,17 @@
+#calendar-container {
+    position: fixed;
+    top: 0;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+}
+
+.fc-header-toolbar {
+    /*
+    the calendar will be butting up against the edges,
+    but let's scoot in the header's buttons
+    */
+    padding-top: 14px;
+    padding-left: 0;
+    padding-right: 0;
+}
