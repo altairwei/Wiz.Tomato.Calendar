@@ -35,15 +35,17 @@ export default class FullCalendar extends React.Component{
 	}
 
   	componentWillReceiveProps(nextProps){
+		/*
   		this.jq(`#${this.root}`).fullCalendar('destroy');
   		const objectMapperSettings = this.fullcalendarObjectMapper.getSettings(nextProps);
     	this.instance = this.jq(`#${this.root}`).fullCalendar(objectMapperSettings);
-  	}
+		*/
+	}
 
 	render(){
 		this.root = this.props.id || 'ID' + this.date.getTime(); 
 		return (
-			<div id={this.root} ref={this.root}></div>
+			<div id={this.root} ref={this.props.calendarRef}></div>
 		)
 	}
 }

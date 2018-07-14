@@ -9,7 +9,7 @@ function WizConfirm(msg, title) {
 }
 
 function WizAlert(msg) {
-    objWindow.ShowMessage(msg, "{p}", 0x00000040);
+    WizExplorerWindow.ShowMessage(msg, "{p}", 0x00000040);
 }
 
 function WizBubbleMessage(title, msg, color = '#FFFA9D', delay = '3') {

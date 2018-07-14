@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/altairwei/Wiz.Tomato.Calendar#readme",
   "devDependencies": {
+    "@fortawesome/fontawesome-free": "^5.1.0",
     "awesome-typescript-loader": "^5.2.0",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
@@ -54,6 +55,7 @@
     "moment": "^2.22.2",
     "popper.js": "^1.14.3",
     "react": "^16.4.1",
+    "react-bootstrap": "^0.32.1",
     "react-dom": "^16.4.1"
   }
 }

@@ -12,19 +12,25 @@ export default class Calendar extends React.Component {
             events: []
         }
         this.dataLoader = null;
-        this.$calendar = null;
+        this.calendar = null;
         //绑定句柄
+        this.onCalendarRender = this.onCalendarRender.bind(this);
         this.onViewRender = this.onViewRender.bind(this);
         this.onEventRender = this.onEventRender.bind(this);
     }
 
+    onCalendarRender(el) {
+        this.calendar = el;
+        this.dataLoader = new WizEventDataLoader(this.calendar);
+    }
+
     onViewRender( view, element ) {
         // 刷新视图，重新获取日历事件
-        const calendar = this.$calendar;
+        const $calendar = $(this.calendar);
         const eventSources = this.dataLoader.getEventSources( view, element );
-        calendar.fullCalendar('removeEvents');
+        $calendar.fullCalendar('removeEvents');
         for (let i=0 ; i < eventSources.length; i++) {
-            calendar.fullCalendar('addEventSource', eventSources[i]);
+            $calendar.fullCalendar('addEventSource', eventSources[i]);
         }
     }
 
@@ -38,24 +44,19 @@ export default class Calendar extends React.Component {
     }
 
     componentDidMount() {
-        this.$calendar = $( ReactDOM.findDOMNode(this.refs.fullcalendar.refs.calendar) );
+        
+    }
+ 
+    render() {
         /**
          * 设置事件句柄
          * 因为fullcalendar-reactWrapper的实现是直接返回<div id='fullcalendar'></div>
          * 并且调用$('#fullcalendar').fullcalendar(this.props)进行构建，因此React并没有
          * 管理FullCalendar状态和渲染的能力。所以直接在设置中做好callback，让插件自我管理。
          */
-        this.dataLoader = new WizEventDataLoader(this.$calendar);
-        this.$calendar.fullCalendar('option', {
-            viewRender: this.onViewRender,
-            eventRender: this.onEventRender
-        });
-    }
- 
-    render() {
         return (
             <div id="calendar-container">
-                <FullCalendar ref='fullcalendar'
+                <FullCalendar calendarRef={this.onCalendarRender}
                     // 基本配置
                     id = "calendar"
                     themeSystem = 'standard'
@@ -115,6 +116,10 @@ export default class Calendar extends React.Component {
                         "agendaWeek": 1,
                         "agendaDay": 1
                     }}
+                    // 设置句柄
+                    viewRender = {this.onViewRender}
+                    eventRender = {this.onEventRender}
+                    eventClick = {this.props.onEventClick}
                 />
             </div>
         );
