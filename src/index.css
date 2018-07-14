@@ -48,18 +48,3 @@ a[data-goto] {
 .input-group-addon:last-child {
   border-right-width: 1px;
 }
-
-/* 事件渲染
--------------------------------------------------------------------------*/
-.tc-complete {
-    opacity: 0.3;
-
-}
-
-.tc-complete > .fc-content {
-    text-decoration: line-through !important;
-}
-
-.tc-complete:hover {
-    opacity: 1;
-}

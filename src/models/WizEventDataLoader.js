@@ -11,12 +11,11 @@ export default class WizEventDataLoader {
 	 * @param {string} start 查询起始日期，ISO标准日期字符串.
 	 * @param {string} end 查询截至日期，ISO标准日期字符串.
      */
-	constructor(start, end) {
+	constructor(calendar) {
 		if (!objDatabase) throw new Error('WizDatabase not valid !');
 		this.Database = objDatabase;
 		this.userName = objDatabase.UserName;
-		this.start = start;
-		this.end = end;
+		this.$calendar = $(calendar);
 	};
 
 	/**
@@ -66,7 +65,7 @@ export default class WizEventDataLoader {
 				if ( !obj || !Array.isArray(obj) ) return false;
 				for (let i = 0; i < obj.length; i ++) {
 					events.push(
-						new CalendarEvent(obj[i]).toFullCalendarEvent()
+						new CalendarEvent(obj[i], this.$calendar).toFullCalendarEvent()
 					);
 				}
 				
@@ -116,7 +115,7 @@ export default class WizEventDataLoader {
 		
 		for (let i = 0; i < obj.length; i ++) {
 			repeatEvents.push(
-				new CalendarEvent(obj[i]).generateRepeatEvents(start, end)
+				new CalendarEvent(obj[i], this.$calendar).generateRepeatEvents(start, end)
 			)
 		}
 		return repeatEvents;
@@ -204,7 +203,7 @@ export default class WizEventDataLoader {
 				end: selectionData.end,
 				allDay: selectionData.start.hasTime() && selectionData.end.hasTime() ? false : true,
 				backgroundColor: userInputs.color ? userInputs.color : '#32CD32',
-			});
+			}, this.$calendar);
 			// 保存并渲染事件
 			newEvent.saveToWizEventDoc();
 			newEvent.refetchData();

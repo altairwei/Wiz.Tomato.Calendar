@@ -17,7 +17,7 @@ class FullcalendarObjectMapper{
     	}
     	return newSettings;
 	}
-}	
+}
 
 export default class FullCalendar extends React.Component{
 	constructor(){
@@ -42,8 +42,8 @@ export default class FullCalendar extends React.Component{
 
 	render(){
 		this.root = this.props.id || 'ID' + this.date.getTime(); 
-		return(
-			<div id={this.root}></div>
+		return (
+			<div id={this.root} ref={this.root}></div>
 		)
 	}
 }

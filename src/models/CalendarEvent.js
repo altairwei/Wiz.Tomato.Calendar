@@ -8,8 +8,9 @@ export default class CalendarEvent {
      * 创建一个通用日程.
 	 * @param {Object} data 原始数据类型，可以是 WizEvent, FullCalendarEvent 以及 GUID.
      */
-	constructor( data ) {
+	constructor( data, calendar ) {
 		if (!g_db) throw new Error('IWizDatabase is not valid.');
+		this.$calendar = $(calendar);
 		const type = this._checkDataType(data);
 		switch ( type ) {
 			case "WizEvent":
@@ -358,7 +359,7 @@ export default class CalendarEvent {
 
 	addToFullCalendar() {
 		//TODO: 将自身添加到FullCalendar
-		$('#calendar').fullCalendar( 'addEventSource', {
+		this.$calendar.fullCalendar( 'addEventSource', {
 			events: [
 				this.toFullCalendarEvent()
 			]
@@ -439,7 +440,7 @@ export default class CalendarEvent {
 		let doc = g_db.DocumentFromGUID(this.id);
 		if (!doc) throw new Error('Can not find Event related WizDocument.')
 		// 移除FullCalendar事件
-		$('#calendar').fullCalendar('removeEvents', this.id);
+		this.$calendar.fullCalendar('removeEvents', this.id);
 		// 移除日历数据
 		doc.RemoveFromCalendar();
 		// 删除文档
@@ -456,7 +457,7 @@ export default class CalendarEvent {
 			// 重新渲染FullCalendar事件
 			event.title = this.title;
 			event.backgroundColor = this.backgroundColor;
-			$('#calendar').fullCalendar('updateEvent', event);
+			this.$calendar.fullCalendar('updateEvent', event);
 		} else {
 			//用.fullCalendar( ‘clientEvents’ [, idOrFilter ] ) -> Array 获取源数据从而更新
 			//TODO: 遍历并寻找GUID匹配的事件

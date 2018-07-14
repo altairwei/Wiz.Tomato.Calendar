@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import FullCalendar from './FullCalendar';
 import 'fullcalendar-reactwrapper/dist/css/fullcalendar.min.css';
 import './Calendar.css';
@@ -10,13 +11,16 @@ export default class Calendar extends React.Component {
         this.state = {
             events: []
         }
-        this.dataLoader = new WizEventDataLoader();
+        this.dataLoader = null;
+        this.$calendar = null;
         //绑定句柄
         this.onViewRender = this.onViewRender.bind(this);
+        this.onEventRender = this.onEventRender.bind(this);
     }
 
     onViewRender( view, element ) {
-        const calendar = $('#calendar');
+        // 刷新视图，重新获取日历事件
+        const calendar = this.$calendar;
         const eventSources = this.dataLoader.getEventSources( view, element );
         calendar.fullCalendar('removeEvents');
         for (let i=0 ; i < eventSources.length; i++) {
@@ -24,16 +28,34 @@ export default class Calendar extends React.Component {
         }
     }
 
+    onEventRender( eventObj, $el ) {
+        // 元素已经渲染，可修改元素
+        const isComplete = parseInt(eventObj.complete) == 5;
+        if ( isComplete ) {
+            // 样式
+            $el.addClass('tc-complete');
+        }
+    }
+
     componentDidMount() {
-        //$('#calendar').fullCalendar('option', {
-        //    viewRender: this.onViewRender
-        //});
+        this.$calendar = $( ReactDOM.findDOMNode(this.refs.fullcalendar.refs.calendar) );
+        /**
+         * 设置事件句柄
+         * 因为fullcalendar-reactWrapper的实现是直接返回<div id='fullcalendar'></div>
+         * 并且调用$('#fullcalendar').fullcalendar(this.props)进行构建，因此React并没有
+         * 管理FullCalendar状态和渲染的能力。所以直接在设置中做好callback，让插件自我管理。
+         */
+        this.dataLoader = new WizEventDataLoader(this.$calendar);
+        this.$calendar.fullCalendar('option', {
+            viewRender: this.onViewRender,
+            eventRender: this.onEventRender
+        });
     }
  
     render() {
         return (
             <div id="calendar-container">
-                <FullCalendar
+                <FullCalendar ref='fullcalendar'
                     // 基本配置
                     id = "calendar"
                     themeSystem = 'standard'
@@ -93,13 +115,6 @@ export default class Calendar extends React.Component {
                         "agendaWeek": 1,
                         "agendaDay": 1
                     }}
-                    /**
-                     * 设置事件句柄
-                     * 因为fullcalendar-reactWrapper的实现是直接返回<div id='fullcalendar'></div>
-                     * 并且调用$('#fullcalendar').fullcalendar(this.props)进行构建，因此React并没有
-                     * 管理FullCalendar状态和渲染的能力。因此直接在设置中做好callback，让插件自我管理。
-                     */
-                    viewRender = {this.onViewRender}
                 />
             </div>
         );

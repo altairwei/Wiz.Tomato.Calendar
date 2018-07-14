@@ -1,3 +1,6 @@
+
+/* 日历整体样式
+-------------------------------------------------------------------------*/
 #calendar-container {
     position: fixed;
     top: 0;
@@ -14,4 +17,19 @@
     padding-top: 14px;
     padding-left: 0;
     padding-right: 0;
+}
+
+/* 事件渲染
+-------------------------------------------------------------------------*/
+.tc-complete {
+    opacity: 0.3;
+
+}
+
+.tc-complete > .fc-content {
+    text-decoration: line-through !important;
+}
+
+.tc-complete:hover {
+    opacity: 1;
 }
