@@ -3,7 +3,7 @@ import 'bootstrap/js/modal';
 import FormHandles from '../Utils/FormHandles';
 import { createDatetimePicker } from '../Widget/DateTimePicker';
 import { createColorPicker } from '../Widget/ColorPicker';
-import EventModal from './EventModal';
+import EventModal from './EventModalOld';
 
 
 export default class EventCreateModal extends EventModal {

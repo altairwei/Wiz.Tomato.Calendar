@@ -24,7 +24,7 @@ export default class EventSimpleForm extends React.Component {
                     value={this.props.eventStart.format('YYYY-MM-DD HH:mm:ss')}
                     onInputChange={this.handleInputChange}
                 />
-                <ColorPicker id = 'tc-editpopper-eventcolor' 
+                <ColorPicker horizontal id = 'tc-editpopper-eventcolor' 
                     label={<i className='fas fa-paint-brush fa-lg' />}
                     value={this.props.colorValue}
                     onInputChange={this.handleInputChange}

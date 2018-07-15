@@ -51,23 +51,37 @@ export default class ColorPicker extends React.Component {
 
     render() {
         //TODO: 读取父元素horizontal属性，决定条件渲染
-        return (
-            <FormGroup controlId={this.props.id}>
-                <Col componentClass={ControlLabel} sm={2}>
-                    {this.props.label}
-                </Col>
-                <Col sm={10}>
-                    <FormControl type="text"
-                        ref={(instance) => this.inputFormControl = instance}
-                        value={this.props.value} //hex色彩值
-                        style={{ //改变颜色
-                            backgroundColor: `${this.props.value}`
-                        }} 
-                        readOnly={this.props.readOnly}
-                        onChange={this.props.onInputChange}
-                    />
-                </Col>
-            </FormGroup>
+        const isHorizontal = this.props.horizontal;
+        const colorFormControl = (
+            <FormControl type="text"
+                ref={(instance) => this.inputFormControl = instance}
+                value={this.props.value} //hex色彩值
+                style={{ //改变颜色
+                    backgroundColor: `${this.props.value}`
+                }} 
+                readOnly={this.props.readOnly}
+                onChange={this.props.onInputChange}
+            />            
         )
+        if (isHorizontal) {
+            return (
+                <FormGroup controlId={this.props.id}>
+                    <Col componentClass={ControlLabel} sm={2}>
+                        {this.props.label}
+                    </Col>
+                    <Col sm={10}>
+                        {colorFormControl}
+                    </Col>
+                </FormGroup>
+            )
+        } else {
+            return (
+                <FormGroup controlId={this.props.id}>
+                    <ControlLabel>{this.props.label}</ControlLabel>
+                    {colorFormControl}
+                </FormGroup>                
+            )
+        }
+
     }
 }

@@ -17,8 +17,12 @@ export default class Calendar extends React.Component {
         this.onCalendarRender = this.onCalendarRender.bind(this);
         this.onViewRender = this.onViewRender.bind(this);
         this.onEventRender = this.onEventRender.bind(this);
+        this.onEventDrop = this.onEventDrop.bind(this);
+        this.onEventResize = this.onEventResize.bind(this);
     }
 
+    // 事件句柄
+    // ------------------------------------------------------------
     onCalendarRender(el) {
         this.calendar = el;
         this.dataLoader = new WizEventDataLoader(this.calendar);
@@ -31,6 +35,22 @@ export default class Calendar extends React.Component {
         $calendar.fullCalendar('removeEvents');
         for (let i=0 ; i < eventSources.length; i++) {
             $calendar.fullCalendar('addEventSource', eventSources[i]);
+        }
+    }
+
+    onEventDrop( event, delta, revertFunc, jsEvent, ui, view ) {
+        if (event.id){
+            this.dataLoader.updateEventDataOnDrop(event, delta, revertFunc, jsEvent, ui, view)
+        } else {
+            revertFunc();
+        }        
+    }
+
+    onEventResize( event, delta, revertFunc, jsEvent, ui, view ) {
+        if (event.id){
+            this.dataLoader.updateEventDataOnResize(event, delta, revertFunc, jsEvent, ui, view);
+        } else {
+            revertFunc();
         }
     }
 
@@ -117,9 +137,12 @@ export default class Calendar extends React.Component {
                         "agendaDay": 1
                     }}
                     // 设置句柄
+                    select = {this.props.onSelect}
                     viewRender = {this.onViewRender}
                     eventRender = {this.onEventRender}
                     eventClick = {this.props.onEventClick}
+                    eventDrop = {this.onEventDrop}
+                    eventResize = {this.onEventResize}
                 />
             </div>
         );

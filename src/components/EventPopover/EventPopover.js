@@ -2,7 +2,7 @@ import React from 'react';
 import './EventPopover.css';
 import Popper from 'popper.js';
 import PopoverTitleInput from './PopoverTitleInput';
-import PopoverSimpleForm from './PopoverSimpleForm';
+import PopoverSimpleForm from '../Form/PopoverSimpleForm';
 import PopoverToolbar from './PopoverToolbar';
 import EventHandles from '../../models/EventHandles';
 
