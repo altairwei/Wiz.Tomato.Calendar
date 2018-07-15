@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Nav, NavItem, Tabs, Tab, Button, Row, Col } from 'react-bootstrap';
+import { Modal, Nav, NavItem, Tabs, Tab, Button, Row, Col, CloseButton } from 'react-bootstrap';
 
 export default class EventPopover extends React.Component {
 
@@ -9,8 +9,14 @@ export default class EventPopover extends React.Component {
                 <Tab.Container id="tabs-with-dropdown" defaultActiveKey="1">
                     <Row className="clearfix">
                         <Col sm={12}>
-                            <Modal.Header closeButton>
-                                <Nav bsStyle="tabs">
+                            <Modal.Header
+                                style={{borderBottom: 'none', padding: '0'}}>
+                                <Nav bsStyle="tabs"
+                                    style={{padding: '15px 15px 0 15px'}}>
+                                    <CloseButton
+                                        label={true}
+                                        onClick={this.props.onModalClose}
+                                    />
                                     <NavItem eventKey="1" href="#tc-repeatform">
                                         日程编辑
                                     </NavItem>
