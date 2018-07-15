@@ -1,7 +1,7 @@
 import $ from 'jquery';
-import 'jquery-ui/ui/widget';
+import 'jquery-ui';
 import 'bootstrap/js/dropdown';
-import '@fortawesome/fontawesome-free/js/all';
+import '../../../node_modules/_@fortawesome_fontawesome-free@5.1.0@@fortawesome/fontawesome-free/js/all';
 import Popper from 'popper.js';
 import './EventPopover.css';
 import { renderFormComponent } from '../../Utils/FormUtils';

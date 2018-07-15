@@ -25,6 +25,8 @@ export default class ColorPicker extends React.Component {
         super(props);
     }
 
+    //TODO: 根据饱和度计算字体颜色
+
     componentDidMount() {
         // 初始化组件
         this.input = ReactDOM.findDOMNode(this.inputFormControl);
@@ -57,7 +59,10 @@ export default class ColorPicker extends React.Component {
                 <Col sm={10}>
                     <FormControl type="text"
                         ref={(instance) => this.inputFormControl = instance}
-                        value={this.props.value}
+                        value={this.props.value} //hex色彩值
+                        style={{ //改变颜色
+                            backgroundColor: `${this.props.value}`
+                        }} 
                         readOnly={this.props.readOnly}
                         onChange={this.props.onInputChange}
                     />

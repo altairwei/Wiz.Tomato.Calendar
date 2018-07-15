@@ -18,7 +18,7 @@ export default class EventSimpleForm extends React.Component {
 
     render() {
         return (
-            <Form horizontal>
+            <Form horizontal id={this.props.id}>
                 <DateTimePicker readOnly id = 'tc-editpopper-eventdate' 
                     label={<i className='far fa-calendar-alt fa-lg' />}
                     value={this.props.eventStart.format('YYYY-MM-DD HH:mm:ss')}
