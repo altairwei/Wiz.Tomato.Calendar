@@ -20,13 +20,17 @@ export default class EventPopover extends React.Component {
         }
         // 绑定事件
         this.autoHide = this.autoHide.bind(this);
+        this.handleDateTimeChange = this.handleDateTimeChange.bind(this);
         this.handleTitleChange = this.handleTitleChange.bind(this);
         this.handleColorChange = this.handleColorChange.bind(this);
+        this.handleBtnClick = this.handleBtnClick.bind(this);
+        /*
         this.handleSaveBtnClick = this.handleSaveBtnClick.bind(this);
         this.handleCompleteBtnClick = this.handleCompleteBtnClick.bind(this);
         this.handleOpenDocBtnClick = this.handleOpenDocBtnClick.bind(this);
         this.handleDeleteDataBtnClick = this.handleDeleteDataBtnClick.bind(this);
         this.handleDeleteDocBtnClick = this.handleDeleteDocBtnClick.bind(this);
+        */
     }
 
     // 动画效果
@@ -76,45 +80,22 @@ export default class EventPopover extends React.Component {
         })
     }
 
-    handleColorChange(e) {
-        const newColor = e.target.value;
-        console.log(newColor)
+    handleColorChange(colorValue) {
+        const newColor = colorValue;
+        
     }
 
-    handleInputChange(e) {
-        //
+    handleDateTimeChange(e) {
+        //暂时不允许更改
     }
 
-    //TODO: 写一个通用方法计算BtnClick调用，以免代码重复
-
-    handleSaveBtnClick(e) {
+    handleBtnClick(e) {
+        const id = e.target.id;
+        const btnType = id.split('-')[2];
+        const handleName = `on${btnType}BtnClick`
         this.hide().then( 
-            (ret) => this.eventHandles.onSaveBtnClick(this.props.event, this.state.newEventData) 
-        )
-    }
-
-    handleCompleteBtnClick(e) {
-        this.hide().then(
-            (ret) => this.eventHandles.onCompleteBtnClick(this.props.event) 
-        )
-    }
-
-    handleOpenDocBtnClick(e) {
-        this.hide().then(
-            (ret) => this.eventHandles.onOpenDocBtnClick(this.props.event) 
-        )
-    }
-
-    handleDeleteDataBtnClick(e) {
-        this.hide().then(
-            (ret) => this.eventHandles.onDeleteDataBtnClick(this.props.event) 
+            (ret) => this.eventHandles[handleName](this.props.event, this.state.newEventData) 
         )        
-    }
-
-    handleDeleteDocBtnClick(e) {
-        this.hide().then(
-            (ret) => this.eventHandles.onDeleteDocBtnClick(this.props.event) 
-        )  
     }
 
     // 生命周期
@@ -158,6 +139,10 @@ export default class EventPopover extends React.Component {
         return true;
     }
 
+    componentWillUnmount() {
+        $(document).off('click', this.autoHide)
+    }
+
     render() {
         const eventStart = this.props.event.start.format('YYYY-MM-DD HH:mm:ss');
         const colorValue = this.props.event.backgroundColor
@@ -178,21 +163,20 @@ export default class EventPopover extends React.Component {
                         <DateTimePicker horizontal readOnly id = 'tc-editpopper-eventdate' 
                             label={<i className='far fa-calendar-alt fa-lg' />}
                             value={eventStart}
-                            onInputChange={this.handleInputChange}
+                            onDateTimeChange={this.handleDateTimeChange}
                         />
-                        <ColorPicker horizontal id = 'tc-editpopper-eventcolor' 
+                        <ColorPicker horizontal 
+                            key={this.props.event.id}
+                            id='tc-editpopper-eventcolor' 
                             label={<i className='fas fa-paint-brush fa-lg' />}
                             value={colorValue}
                             onColorChange={this.handleColorChange}
                         />
                     </Form>
                     <PopoverToolbar
+                        complete={this.props.event.complete}
                         enableSaveBtn={!!this.state.newEventData.title}
-                        onSaveBtnClick={this.handleSaveBtnClick}
-                        onCompleteBtnClick={this.handleCompleteBtnClick}
-                        onOpenDocBtnClick={this.handleOpenDocBtnClick}
-                        onDeleteDataBtnClick={this.handleDeleteDataBtnClick}
-                        onDeleteDocBtnClick={this.handleDeleteDocBtnClick}
+                        onBtnClick={this.handleBtnClick}
                     />
                 </div>
             </div>
