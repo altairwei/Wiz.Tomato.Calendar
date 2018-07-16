@@ -2,9 +2,11 @@ import React from 'react';
 import './EventPopover.css';
 import Popper from 'popper.js';
 import PopoverTitleInput from './PopoverTitleInput';
-import PopoverSimpleForm from '../Form/PopoverSimpleForm';
 import PopoverToolbar from './PopoverToolbar';
 import EventHandles from '../../models/EventHandles';
+import { Form, Glyphicon } from 'react-bootstrap';
+import DateTimePicker from '../Form/DateTimePicker';
+import ColorPicker from '../Form/ColorPicker';
 
 export default class EventPopover extends React.Component {
     constructor(props) {
@@ -19,6 +21,7 @@ export default class EventPopover extends React.Component {
         // 绑定事件
         this.autoHide = this.autoHide.bind(this);
         this.handleTitleChange = this.handleTitleChange.bind(this);
+        this.handleColorChange = this.handleColorChange.bind(this);
         this.handleSaveBtnClick = this.handleSaveBtnClick.bind(this);
         this.handleCompleteBtnClick = this.handleCompleteBtnClick.bind(this);
         this.handleOpenDocBtnClick = this.handleOpenDocBtnClick.bind(this);
@@ -71,6 +74,15 @@ export default class EventPopover extends React.Component {
             newEventData.title = newTitle;
             return { newEventData };
         })
+    }
+
+    handleColorChange(e) {
+        const newColor = e.target.value;
+        console.log(newColor)
+    }
+
+    handleInputChange(e) {
+        //
     }
 
     //TODO: 写一个通用方法计算BtnClick调用，以免代码重复
@@ -147,6 +159,8 @@ export default class EventPopover extends React.Component {
     }
 
     render() {
+        const eventStart = this.props.event.start.format('YYYY-MM-DD HH:mm:ss');
+        const colorValue = this.props.event.backgroundColor
         return (
             <div className="tc-popover"
                     style={{display: 'none'}}
@@ -154,21 +168,31 @@ export default class EventPopover extends React.Component {
                 <div className="arrow"></div>
                 <div className="tc-popover-header">
                     <PopoverTitleInput 
+                        key={this.props.event.id}
                         eventTitle={this.props.event.title}
                         onTitleChange={this.handleTitleChange} 
                         targetForm='tc-popover-event-editForm' />
                 </div>
                 <div className="tc-popover-body">
-                    <PopoverSimpleForm 
-                        id='tc-popover-event-editForm'
-                        eventStart={this.props.event.start}
-                        colorValue={this.props.event.backgroundColor} />
+                    <Form horizontal id='tc-popover-event-editForm'>
+                        <DateTimePicker horizontal readOnly id = 'tc-editpopper-eventdate' 
+                            label={<i className='far fa-calendar-alt fa-lg' />}
+                            value={eventStart}
+                            onInputChange={this.handleInputChange}
+                        />
+                        <ColorPicker horizontal id = 'tc-editpopper-eventcolor' 
+                            label={<i className='fas fa-paint-brush fa-lg' />}
+                            value={colorValue}
+                            onColorChange={this.handleColorChange}
+                        />
+                    </Form>
                     <PopoverToolbar
                         enableSaveBtn={!!this.state.newEventData.title}
                         onSaveBtnClick={this.handleSaveBtnClick}
                         onCompleteBtnClick={this.handleCompleteBtnClick}
                         onOpenDocBtnClick={this.handleOpenDocBtnClick}
-                        onDeleteDataBtnClick={this.onDeleteDataBtnClick}
+                        onDeleteDataBtnClick={this.handleDeleteDataBtnClick}
+                        onDeleteDocBtnClick={this.handleDeleteDocBtnClick}
                     />
                 </div>
             </div>

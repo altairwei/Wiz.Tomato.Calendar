@@ -1,7 +1,7 @@
 import React from 'react';
 import { Modal, Nav, NavItem, Tabs, Tab, Button, Row, Col, CloseButton } from 'react-bootstrap';
 
-export default class EventPopover extends React.Component {
+export default class EventModal extends React.Component {
 
     render() {
         return (
@@ -14,7 +14,6 @@ export default class EventPopover extends React.Component {
                                 <Nav bsStyle="tabs"
                                     style={{padding: '15px 15px 0 15px'}}>
                                     <CloseButton
-                                        label={true}
                                         onClick={this.props.onModalClose}
                                     />
                                     <NavItem eventKey="1" href="#tc-repeatform">

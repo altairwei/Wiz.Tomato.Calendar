@@ -60,7 +60,7 @@ export default class ColorPicker extends React.Component {
                     backgroundColor: `${this.props.value}`
                 }} 
                 readOnly={this.props.readOnly}
-                onChange={this.props.onInputChange}
+                onChange={(e)=>console.log(e)}
             />            
         )
         if (isHorizontal) {

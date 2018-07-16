@@ -10,7 +10,7 @@ export default class CalendarEvent {
      */
 	constructor( data, calendar ) {
 		if (!g_db) throw new Error('IWizDatabase is not valid.');
-		this.$calendar = $(calendar);
+		this.$calendar = calendar ? $(calendar) : $('#calendar');
 		const type = this._checkDataType(data);
 		switch ( type ) {
 			case "WizEvent":
