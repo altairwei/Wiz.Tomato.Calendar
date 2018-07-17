@@ -18,7 +18,8 @@ export default class PopoverToolbar extends React.Component {
                         onClick={this.props.onBtnClick}>
                         {parseInt(this.props.complete) == 5 ? '恢复' : '完成'}
                     </Button>
-                    <Button id='tc-editpopper-Edit'>
+                    <Button id='tc-editpopper-Edit'
+                        onClick={this.props.onBtnClick}>
                         编辑
                     </Button>
                     <SplitButton pullRight 

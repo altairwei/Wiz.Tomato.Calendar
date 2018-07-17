@@ -5,8 +5,8 @@ import PopoverTitleInput from './PopoverTitleInput';
 import PopoverToolbar from './PopoverToolbar';
 import EventHandles from '../../models/EventHandles';
 import { Form, Glyphicon } from 'react-bootstrap';
-import DateTimePicker from '../Form/DateTimePicker';
-import ColorPicker from '../Form/ColorPicker';
+import DateTimePickerGroup from '../Form/DateTimePickerGroup';
+import ColorPickerGroup from '../Form/ColorPickerGroup';
 
 export default class EventPopover extends React.Component {
     constructor(props) {
@@ -24,13 +24,6 @@ export default class EventPopover extends React.Component {
         this.handleTitleChange = this.handleTitleChange.bind(this);
         this.handleColorChange = this.handleColorChange.bind(this);
         this.handleBtnClick = this.handleBtnClick.bind(this);
-        /*
-        this.handleSaveBtnClick = this.handleSaveBtnClick.bind(this);
-        this.handleCompleteBtnClick = this.handleCompleteBtnClick.bind(this);
-        this.handleOpenDocBtnClick = this.handleOpenDocBtnClick.bind(this);
-        this.handleDeleteDataBtnClick = this.handleDeleteDataBtnClick.bind(this);
-        this.handleDeleteDocBtnClick = this.handleDeleteDocBtnClick.bind(this);
-        */
     }
 
     // 动画效果
@@ -54,7 +47,10 @@ export default class EventPopover extends React.Component {
     hide() {
         const that = this;
         return new Promise(function(resolve, reject){
-            $(that.popperNode).hide(0, null, resolve);
+            $(that.popperNode).hide(0, null, function(){
+                that.props.onPopoverHide();
+                resolve();
+            });
         })
         
     }
@@ -82,7 +78,12 @@ export default class EventPopover extends React.Component {
 
     handleColorChange(colorValue) {
         const newColor = colorValue;
-        
+        this.setState(function(prevState, props) {
+            //拷贝前一个对象
+            const newEventData = Object.create(prevState.newEventData);
+            newEventData.backgroundColor = newColor;
+            return { newEventData };
+        })
     }
 
     handleDateTimeChange(e) {
@@ -93,9 +94,17 @@ export default class EventPopover extends React.Component {
         const id = e.target.id;
         const btnType = id.split('-')[2];
         const handleName = `on${btnType}BtnClick`
-        this.hide().then( 
-            (ret) => this.eventHandles[handleName](this.props.event, this.state.newEventData) 
-        )        
+        this.hide().then( (ret) => {
+            switch(handleName) {
+                case 'onEditBtnClick':
+                    this.props.onEditBtnClick(this.props.event);
+                    break;
+                default:
+                    this.eventHandles[handleName](this.props.event, this.state.newEventData)
+                    break;
+            }
+            
+        })
     }
 
     // 生命周期
@@ -145,7 +154,8 @@ export default class EventPopover extends React.Component {
 
     render() {
         const eventStart = this.props.event.start.format('YYYY-MM-DD HH:mm:ss');
-        const colorValue = this.props.event.backgroundColor
+        const colorValue = this.props.event.backgroundColor;
+        const enableSaveBtn = !!this.state.newEventData.title || !!this.state.newEventData.backgroundColor;
         return (
             <div className="tc-popover"
                     style={{display: 'none'}}
@@ -160,12 +170,12 @@ export default class EventPopover extends React.Component {
                 </div>
                 <div className="tc-popover-body">
                     <Form horizontal id='tc-popover-event-editForm'>
-                        <DateTimePicker horizontal readOnly id = 'tc-editpopper-eventdate' 
+                        <DateTimePickerGroup horizontal readOnly id = 'tc-editpopper-eventdate' 
                             label={<i className='far fa-calendar-alt fa-lg' />}
                             value={eventStart}
                             onDateTimeChange={this.handleDateTimeChange}
                         />
-                        <ColorPicker horizontal 
+                        <ColorPickerGroup horizontal 
                             key={this.props.event.id}
                             id='tc-editpopper-eventcolor' 
                             label={<i className='fas fa-paint-brush fa-lg' />}
@@ -175,7 +185,7 @@ export default class EventPopover extends React.Component {
                     </Form>
                     <PopoverToolbar
                         complete={this.props.event.complete}
-                        enableSaveBtn={!!this.state.newEventData.title}
+                        enableSaveBtn={enableSaveBtn}
                         onBtnClick={this.handleBtnClick}
                     />
                 </div>

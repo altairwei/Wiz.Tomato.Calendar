@@ -1,5 +1,6 @@
 import React from 'react';
 import { Modal, Nav, NavItem, Tabs, Tab, Button, Row, Col, CloseButton } from 'react-bootstrap';
+import EventDetailFrom from '../Form/EventDetailForm'
 
 export default class EventModal extends React.Component {
 
@@ -22,14 +23,12 @@ export default class EventModal extends React.Component {
                                     <NavItem eventKey="2" href="#tc-repeatform">
                                         重复规则
                                     </NavItem>
-                                </Nav>                    
+                                </Nav>
                             </Modal.Header>
                             <Modal.Body>
                                 <Tab.Content animation>
                                     <Tab.Pane eventKey="1">
-                                        Cras mattis consectetur purus sit amet fermentum. Cras justo odio,
-                                        dapibus ac facilisis in, egestas eget quam. Morbi leo risus, porta
-                                        ac consectetur ac, vestibulum at eros.
+                                        <EventDetailFrom />
                                     </Tab.Pane>
                                     <Tab.Pane eventKey="2">
                                         Aenean lacinia bibendum nulla sed consectetur. Praesent commodo

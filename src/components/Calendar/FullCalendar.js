@@ -24,28 +24,24 @@ export default class FullCalendar extends React.Component{
 		super();
 		this.jq = $.noConflict();
 		this.fullcalendarObjectMapper = new FullcalendarObjectMapper();
-		this.root = null;
 		this.instance = null;
 		this.date = new Date();
 	}
 
 	componentDidMount(){
+		this.props.onFullCalendarRender(this.el);
 		const objectMapperSettings = this.fullcalendarObjectMapper.getSettings(this.props);
-		this.instance = this.jq(`#${this.root}`).fullCalendar(objectMapperSettings);
+		this.instance = this.jq(this.el).fullCalendar(objectMapperSettings);
 	}
 
   	componentWillReceiveProps(nextProps){
-		/*
-  		this.jq(`#${this.root}`).fullCalendar('destroy');
-  		const objectMapperSettings = this.fullcalendarObjectMapper.getSettings(nextProps);
-    	this.instance = this.jq(`#${this.root}`).fullCalendar(objectMapperSettings);
-		*/
+		  
 	}
 
 	render(){
-		this.root = this.props.id || 'ID' + this.date.getTime(); 
+
 		return (
-			<div id={this.root} ref={this.props.calendarRef}></div>
+			<div id='calendar' ref={ el => this.el = el }></div>
 		)
 	}
 }

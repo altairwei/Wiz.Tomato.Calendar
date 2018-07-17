@@ -14,7 +14,7 @@ export default class Calendar extends React.Component {
         this.dataLoader = null;
         this.calendar = null;
         //绑定句柄
-        this.onCalendarRender = this.onCalendarRender.bind(this);
+        this.handleFullCalendarRender = this.handleFullCalendarRender.bind(this);
         this.onViewRender = this.onViewRender.bind(this);
         this.onEventRender = this.onEventRender.bind(this);
         this.onEventDrop = this.onEventDrop.bind(this);
@@ -23,7 +23,9 @@ export default class Calendar extends React.Component {
 
     // 事件句柄
     // ------------------------------------------------------------
-    onCalendarRender(el) {
+
+    handleFullCalendarRender(el) {
+        // FullCalendar 渲染之前执行此句柄，传入DOM
         this.calendar = el;
         this.dataLoader = new WizEventDataLoader(this.calendar);
     }
@@ -55,6 +57,15 @@ export default class Calendar extends React.Component {
     }
 
     onEventRender( eventObj, $el ) {
+        // 设置文本颜色
+        const rgbString = $el.css('background-color');
+        const rgbArray = /^rgb\((\d*), (\d*), (\d*)\)$/.exec(rgbString);
+        if (rgbArray) {
+            const hsl = rgb2hsl(rgbArray[1], rgbArray[2], rgbArray[3]);
+            const lightness = hsl[2] - Math.cos( (hsl[0]+70) / 180*Math.PI ) * 0.15;
+            const textColor = lightness > 0.5 ? '#222' : 'white';
+            $el.css('color', textColor);
+        }
         // 元素已经渲染，可修改元素
         const isComplete = parseInt(eventObj.complete) == 5;
         if ( isComplete ) {
@@ -76,7 +87,7 @@ export default class Calendar extends React.Component {
          */
         return (
             <div id="calendar-container">
-                <FullCalendar calendarRef={this.onCalendarRender}
+                <FullCalendar onFullCalendarRender = {this.handleFullCalendarRender}
                     // 基本配置
                     id = "calendar"
                     themeSystem = 'standard'
@@ -147,4 +158,25 @@ export default class Calendar extends React.Component {
             </div>
         );
     }
+}
+
+function rgb2hsl(r, g, b) {
+    r /= 255; g /= 255; b /= 255;
+
+    var M = Math.max(r, g, b);
+    var m = Math.min(r, g, b);
+    var C = M - m;
+    var L = 0.5*(M + m);
+    var S = (C === 0) ? 0 : C/(1-Math.abs(2*L-1));
+
+    var h;
+    if (C === 0) h = 0; // spec'd as undefined, but usually set to 0
+    else if (M === r) h = ((g-b)/C) % 6;
+    else if (M === g) h = ((b-r)/C) + 2;
+    else if (M === b) h = ((r-g)/C) + 4;
+
+    var H = 60 * h;
+
+    // 分别是hue, sat, lum
+    return [H, parseFloat(S), parseFloat(L)];
 }

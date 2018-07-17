@@ -7,12 +7,21 @@ import 'huebee/dist/huebee.css';
 export default class ColorInput extends React.Component {
     constructor(props) {
         super(props);
+        this.state = {
+            value: this.props.value
+        }
         this.handleChange = this.handleChange.bind(this);
     }
 
-    handleChange(e) {
-        //处理手动输入变更，传入颜色hex
-        const colorValue = e.target.value
+    handleChange(jsEventOrValue) {
+        let colorValue;
+        if ( typeof jsEventOrValue == 'object' ) {
+            this.setState({value: jsEventOrValue.target.value});
+            colorValue = jsEventOrValue.target.value;
+        } else if ( typeof jsEventOrValue == 'string' ) {
+            this.setState({value: jsEventOrValue});
+            colorValue = jsEventOrValue;
+        }
         this.props.onChange(colorValue);
     }
 
@@ -37,15 +46,15 @@ export default class ColorInput extends React.Component {
                 '#DC2127', '#DBADFF', '#E1E1E1'	
             ]
         });
-        //手动更新
+        //初始化颜色
         this.huebeeInstance.setColor(this.props.value);
-        //处理颜色选择
-        this.huebeeInstance.on( 'change', this.props.onChange)
+        //监听huebee颜色选择
+        this.huebeeInstance.on( 'change', this.handleChange)
     }
 
     componentDidUpdate(prevProps) {
-        // 手动更新
-        this.huebeeInstance.setColor(this.props.value);
+        // 手动更新value
+        this.huebeeInstance.setColor(this.state.value);
     }
 
     componentWillUnmount() {
@@ -58,7 +67,7 @@ export default class ColorInput extends React.Component {
             <input type='text' 
                 className='form-control' 
                 ref={el => this.el = el}
-                onChange={this.handleChange}
+                onChange={this.handleChange} //监听键盘输入
             />
         )
 
