@@ -1,49 +1,79 @@
 import React from 'react';
 import { Modal, Nav, NavItem, Tabs, Tab, Button, Row, Col, CloseButton } from 'react-bootstrap';
-import EventDetailFrom from '../Form/EventDetailForm'
+import EventDetailFrom from '../Form/EventDetailForm';
+import moment from 'moment';
 
-export default class EventModal extends React.Component {
-
+class NavHeader extends React.Component {
+    //this.props.children 接受 <NavItem />
     render() {
         return (
-            <Modal show={this.props.show} onHide={this.props.onModalClose}>
+            <Modal.Header
+                style={{borderBottom: 'none', padding: '0'}}>
+                <Nav bsStyle="tabs"
+                    style={{padding: '15px 15px 0 15px'}}>
+                    <CloseButton onClick={this.props.onModalClose} />
+                    {this.props.children}
+                </Nav>
+            </Modal.Header>
+        )
+    }
+}
+
+class TabBody extends React.Component {
+    //this.props.children 接受 <Tab.Pane />
+    render() {
+        return (
+            <Modal.Body>
+                <Tab.Content animation>
+                    {this.props.children}
+                </Tab.Content>
+            </Modal.Body>            
+        )
+    }
+}
+
+class ToolbarFooter extends React.Component {
+    render() {
+        return (
+            <Modal.Footer>
+                {this.props.children}
+            </Modal.Footer>
+        )
+    }
+}
+
+class EventModal extends React.Component {
+    render() {
+        let NavHeader, TabBody, ToolbarFooter;
+        React.Children.forEach(this.props.children, (thisArg) => {
+            const name = thisArg.type.name;
+            if ( name == 'NavHeader' ) {
+                NavHeader = thisArg;
+            } else if ( name == 'TabBody' ) {
+                TabBody = thisArg;
+            } else if ( name == 'ToolbarFooter' ) {
+                ToolbarFooter = thisArg;
+            }
+        })
+
+        return (
+            <Modal show={this.props.show} onHide={this.props.onModalClose}> 
                 <Tab.Container id="tabs-with-dropdown" defaultActiveKey="1">
                     <Row className="clearfix">
                         <Col sm={12}>
-                            <Modal.Header
-                                style={{borderBottom: 'none', padding: '0'}}>
-                                <Nav bsStyle="tabs"
-                                    style={{padding: '15px 15px 0 15px'}}>
-                                    <CloseButton
-                                        onClick={this.props.onModalClose}
-                                    />
-                                    <NavItem eventKey="1" href="#tc-repeatform">
-                                        日程编辑
-                                    </NavItem>
-                                    <NavItem eventKey="2" href="#tc-repeatform">
-                                        重复规则
-                                    </NavItem>
-                                </Nav>
-                            </Modal.Header>
-                            <Modal.Body>
-                                <Tab.Content animation>
-                                    <Tab.Pane eventKey="1">
-                                        <EventDetailFrom />
-                                    </Tab.Pane>
-                                    <Tab.Pane eventKey="2">
-                                        Aenean lacinia bibendum nulla sed consectetur. Praesent commodo
-                                        cursus magna, vel scelerisque nisl consectetur et. Donec sed odio
-                                        dui. Donec ullamcorper nulla non metus auctor fringilla.
-                                    </Tab.Pane>
-                                </Tab.Content>
-                            </Modal.Body>
+                            { NavHeader }
+                            { TabBody }
                         </Col>
                     </Row>
                 </Tab.Container>
-                <Modal.Footer>
-                    <Button >这是一个按钮</Button>
-                </Modal.Footer>
+                { ToolbarFooter }
             </Modal>
         )
     }
 }
+
+EventModal.NavHeader = NavHeader;
+EventModal.TabBody = TabBody;
+EventModal.ToolbarFooter = ToolbarFooter;
+
+export default EventModal;

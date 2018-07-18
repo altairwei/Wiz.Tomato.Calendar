@@ -7,7 +7,7 @@ export default class AutoFormGroup extends React.Component {
         const isHorizontal = this.props.horizontal;
         if (isHorizontal) {
             return (
-                <FormGroup controlId={this.props.id}>
+                <FormGroup controlId={this.props.controlId}>
                     <Col componentClass={ControlLabel} sm={2}>
                         {this.props.label}
                     </Col>
@@ -18,7 +18,7 @@ export default class AutoFormGroup extends React.Component {
             )
         } else {
             return (
-                <FormGroup controlId={this.props.id}>
+                <FormGroup controlId={this.props.controlId}>
                     <ControlLabel>{this.props.label}</ControlLabel>
                     {this.props.children}
                 </FormGroup>                

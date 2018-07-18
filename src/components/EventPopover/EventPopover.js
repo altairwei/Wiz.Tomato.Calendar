@@ -48,7 +48,7 @@ export default class EventPopover extends React.Component {
         const that = this;
         return new Promise(function(resolve, reject){
             $(that.popperNode).hide(0, null, function(){
-                that.props.onPopoverHide();
+                that.props.onPopoverHide(); //TODO: 交由父元素卸载该组件实例，感觉这里不妥
                 resolve();
             });
         })
@@ -97,7 +97,7 @@ export default class EventPopover extends React.Component {
         this.hide().then( (ret) => {
             switch(handleName) {
                 case 'onEditBtnClick':
-                    this.props.onEditBtnClick(this.props.event);
+                    this.props.onEditBtnClick(this.props.event); //交由父元素
                     break;
                 default:
                     this.eventHandles[handleName](this.props.event, this.state.newEventData)
@@ -149,7 +149,8 @@ export default class EventPopover extends React.Component {
     }
 
     componentWillUnmount() {
-        $(document).off('click', this.autoHide)
+        $(document).off('click', this.autoHide);
+        this.popperInstance.destroy();
     }
 
     render() {

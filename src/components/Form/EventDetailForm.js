@@ -1,41 +1,64 @@
 import React from 'react';
-import { Row, Col, Form, FormGroup, ControlLabel } from 'react-bootstrap';
+import { Row, Col, Form, FormGroup, FormControl, ControlLabel } from 'react-bootstrap';
 import TitleInputGroup from './TitleInputGroup';
-import DateTimePickerGroup from './DateTimePickerGroup'
+import DateTimePickerGroup from './DateTimePickerGroup';
+import ColorPickerGroup from './ColorPickerGroup';
 
 export default class EventDetailForm extends React.Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            value: this.props.title
-        }
-
-        this.handleChange = this.handleChange.bind(this);
-    }
-
-    handleChange(e) {
-
+        //由父组件负责处理数据
     }
 
     render() {
+        const handleTitleChange = this.props.onTitleChange;
+        const handleStartChange = this.props.onStartChange;
+        const handleEndChange = this.props.onEndChange;
+        const handleColorChange = this.props.onColorchange;
         return (
             <Form>
-                <TitleInputGroup id="tc-editpage-eventtitle"/>
+                <TitleInputGroup 
+                    controlId="tc-createpage-eventtitle"
+                    value={this.props.eventTitle} 
+                    onTitleChange={handleTitleChange}
+                />
                 <Row>
                     <Col sm={6}>
                         <DateTimePickerGroup 
+                            controlId="tc-createpage-eventstart"
                             label="开始日期"
-                            value="2018-07-17 09:00:00" 
-                            onDateTimeChange={() => {}}  />
+                            value={this.props.start}
+                            onDateTimeChange={handleStartChange}  />
                     </Col>
                     <Col sm={6}>
                         <DateTimePickerGroup 
+                            controlId="tc-createpage-eventend"
                             label="结束日期"
-                            value="2018-07-17 09:00:00" 
-                            onDateTimeChange={() => {}}  />
+                            value={this.props.end}
+                            onDateTimeChange={handleEndChange}  />
                     </Col>
                 </Row>
+                <Row>
+                    <Col sm={6}>
+                        <ColorPickerGroup 
+                            controlId="tc-createpage-eventcolor"
+                            label="色彩"
+                            value=""
+                            onColorChange={handleColorChange}
+                        />
+                    </Col>
+                    <Col sm={6}>
+                        <FormGroup controlId="tc-createpage-eventtags">
+                            <ControlLabel>标签</ControlLabel>
+                            <FormControl />
+                        </FormGroup>     
+                    </Col>
+                </Row>
+                <FormGroup controlId="tc-createpage-eventremark">
+                    <ControlLabel>备注</ControlLabel>
+                    <FormControl componentClass="textarea" />
+                </FormGroup>
             </Form>
         )
     }

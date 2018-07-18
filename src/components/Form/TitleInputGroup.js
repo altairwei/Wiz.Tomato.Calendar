@@ -6,15 +6,20 @@ export default class TitleInputGroup extends React.Component {
 
     constructor(props) {
         super(props);
+        //
         this.state = {
-            value: this.props.title
+            value: this.props.value
         }
-
+        //
         this.handleChange = this.handleChange.bind(this);
     }
 
     handleChange(e) {
-
+        const newTitle = e.target.value;
+        this.setState({
+            value: newTitle
+        });
+        this.props.onTitleChange(newTitle);
     }
 
     render() {
