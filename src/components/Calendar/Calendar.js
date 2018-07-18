@@ -28,6 +28,7 @@ export default class Calendar extends React.Component {
         // FullCalendar 渲染之前执行此句柄，传入DOM
         this.calendar = el;
         this.dataLoader = new WizEventDataLoader(this.calendar);
+        this.props.onCalendarRender(el);
     }
 
     onViewRender( view, element ) {

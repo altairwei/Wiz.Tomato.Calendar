@@ -17,11 +17,16 @@ export default class App extends React.Component {
             selectedRange: null
         }
         //
+        this.handleCalendarRender = this.handleCalendarRender.bind(this);
         this.handleEventClick = this.handleEventClick.bind(this);
         this.handlePopoverHide = this.handlePopoverHide.bind(this);
         this.handleSelect = this.handleSelect.bind(this);
         this.handleModalClose = this.handleModalClose.bind(this);
         this.handleEventEdit = this.handleEventEdit.bind(this);
+    }
+
+    handleCalendarRender(el) {
+        this.calendar = el;
     }
 
     handleEventClick( event, jsEvent, view ) {
@@ -55,7 +60,9 @@ export default class App extends React.Component {
     }
 
     handleModalClose() {
-        //TODO: 触发fullcalendar unselect
+        const $calendar = $(this.calendar);
+        $calendar.fullCalendar('unselect')
+        //
         this.setState({
             isEditingEvent: false,
             isCreatingEvent: false
@@ -63,12 +70,18 @@ export default class App extends React.Component {
     }
 
     render() {
+
         return (
             <div id='wiz-tomato-calendar' >
-                <Calendar key={1} onEventClick = {this.handleEventClick} onSelect={this.handleSelect}/>
+                <Calendar 
+                    onEventClick={this.handleEventClick} 
+                    onSelect={this.handleSelect}
+                    onCalendarRender={this.handleCalendarRender}
+                />
                 {
                     !!this.state.selectedRange &&
                         <EventCreatModal 
+                            key={this.state.selectedRange.jsEvent.pageX}
                             show={this.state.isCreatingEvent}
                             onModalClose={this.handleModalClose}
                             isCreatingEvent={this.state.isCreatingEvent}
@@ -76,7 +89,7 @@ export default class App extends React.Component {
                         />
                 }
                 {
-                    this.state.isShowingEvent && 
+                    !!this.state.isShowingEvent && 
                         <EventPopover 
                             key={this.state.clickedArgs.event.id}
                             event={this.state.clickedArgs.event}

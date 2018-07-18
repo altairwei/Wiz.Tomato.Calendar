@@ -1,39 +1,60 @@
 import React from 'react';
-import { Modal, Nav, NavItem, Tabs, Tab, Button, Row, Col, CloseButton } from 'react-bootstrap';
+import { NavItem, Tab, Button, ButtonToolbar } from 'react-bootstrap';
 import EventDetailFrom from '../Form/EventDetailForm';
 import EventModal from './EventModal'
 import moment from 'moment';
+import EventHandles from '../../models/EventHandles'
 
 export default class EventCreateModal extends React.Component {
 
     constructor(props) {
         super(props);
+        this.eventHandles = new EventHandles();
         //
+        this.state = {
+            title: '',
+            start: this.props.selectedRange.start.format('YYYY-MM-DD HH:mm:ss'),
+            end: this.props.selectedRange.end.format('YYYY-MM-DD HH:mm:ss'),
+            backgroundColor: ''
+        }
         //
         this.handleTitleChange = this.handleTitleChange.bind(this);
         this.handleStartChange = this.handleStartChange.bind(this);
         this.handleEndChange = this.handleEndChange.bind(this);
         this.handleColorChange = this.handleColorChange.bind(this);
+        this.handleEventCreate = this.handleEventCreate.bind(this);
     }
 
     handleTitleChange(newTitle) {
-        console.log(newTitle);
+        this.setState({
+            title: newTitle
+        })
     }
 
     handleStartChange(newDateValue) {
-        console.log(newDateValue)
+        this.setState({
+            start: newDateValue
+        })
     }
 
     handleEndChange(newDateValue) {
-        console.log(newDateValue)
+        this.setState({
+            end: newDateValue
+        })
     }
 
     handleColorChange(newColorValue) {
-        console.log(newColorValue)
+        this.setState({
+            backgroundColor: newColorValue
+        })
+    }
+
+    handleEventCreate() {
+        this.eventHandles.onCreateBtnClick(this.state);
+        this.props.onModalClose();
     }
 
     render() {
-        const selectedRange = this.props.selectedRange;
         return (
             <EventModal {...this.props}>
                 <EventModal.NavHeader {...this.props}>
@@ -47,10 +68,11 @@ export default class EventCreateModal extends React.Component {
                 <EventModal.TabBody {...this.props}>
                     <Tab.Pane eventKey="1">
                         <EventDetailFrom 
-                            key={new Date().toISOString()} //每次select都重新渲染
-                            eventTitle=""
-                            start={selectedRange.start.format('YYYY-MM-DD HH:mm:ss')}
-                            end={selectedRange.end.format('YYYY-MM-DD HH:mm:ss')}
+                            eventTitle={this.state.title}
+                            start={this.state.start}
+                            end={this.state.end}
+                            backgroundColor={this.state.backgroundColor}
+                            //事件句柄
                             onTitleChange={this.handleTitleChange}
                             onStartChange={this.handleStartChange}
                             onEndChange={this.handleEndChange}
@@ -60,7 +82,15 @@ export default class EventCreateModal extends React.Component {
                     <Tab.Pane eventKey="2">Tab 1 content</Tab.Pane>
                 </EventModal.TabBody>
                 <EventModal.ToolbarFooter>
-                    这里是toolbar
+                    <Button 
+                        bsStyle="success"
+                        onClick={this.handleEventCreate}
+                    >
+                        创建
+                    </Button>
+                    <Button onClick={this.props.onModalClose}>
+                        取消
+                    </Button>
                 </EventModal.ToolbarFooter>
             </EventModal>
         )

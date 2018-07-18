@@ -19,6 +19,7 @@ export default class EventDetailForm extends React.Component {
         return (
             <Form>
                 <TitleInputGroup 
+                    autoFocus
                     controlId="tc-createpage-eventtitle"
                     value={this.props.eventTitle} 
                     onTitleChange={handleTitleChange}
@@ -44,20 +45,20 @@ export default class EventDetailForm extends React.Component {
                         <ColorPickerGroup 
                             controlId="tc-createpage-eventcolor"
                             label="色彩"
-                            value=""
+                            value={this.props.backgroundColor}
                             onColorChange={handleColorChange}
                         />
                     </Col>
                     <Col sm={6}>
                         <FormGroup controlId="tc-createpage-eventtags">
                             <ControlLabel>标签</ControlLabel>
-                            <FormControl />
+                            <FormControl readOnly/>
                         </FormGroup>     
                     </Col>
                 </Row>
                 <FormGroup controlId="tc-createpage-eventremark">
                     <ControlLabel>备注</ControlLabel>
-                    <FormControl componentClass="textarea" />
+                    <FormControl readOnly componentClass="textarea" />
                 </FormGroup>
             </Form>
         )

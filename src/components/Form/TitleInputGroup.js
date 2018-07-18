@@ -26,6 +26,7 @@ export default class TitleInputGroup extends React.Component {
         return (
             <AutoFormGroup label="标题" {...this.props}>
                 <FormControl
+                    {...this.props}
                     type="text"
                     value={this.state.value}
                     placeholder="请输入标题"

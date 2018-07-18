@@ -8,12 +8,25 @@ export default class FormHandles {
         this.$calendar = $('#calendar')
     };
 
-    onCreateBtnClick(start, end, jsEvent, view, formNode) {
-        const title = $(formNode).find('#tc-createpage-eventtitle').val();
-        const color = $(formNode).find('#tc-createpage-eventcolor').val();
-        new WizEventDataLoader().createEvent({start, end, jsEvent, view}, {title, color}); // 这一步耗时
-        $(formNode).modal('hide');
-        $('#calendar').fullCalendar('unselect');
+    onCreateBtnClick(data) {
+        const fullCalendar = this.$calendar.fullCalendar('getCalendar');
+        const moment = fullCalendar.moment.bind(fullCalendar);
+        const title = data.title;
+        const color = data.backgroundColor;
+        const start = moment(data.start);
+        const end = moment(data.end);
+        // 获取用户设置
+        const newEvent = new CalendarEvent({
+            title: title || '无标题',
+            start: start,
+            end: end,
+            allDay: start.hasTime() && end.hasTime() ? false : true,
+            backgroundColor: color ? color : '#32CD32',
+        }, this.$calendar);
+        // 保存并渲染事件
+        newEvent.saveToWizEventDoc();
+        newEvent.refetchData();
+        newEvent.addToFullCalendar();
     };
 
     onSaveBtnClick(event, newEventData) {
