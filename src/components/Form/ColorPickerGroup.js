@@ -85,8 +85,9 @@ export default class ColorPickerGroup extends React.Component {
     }
 
     render() {
+        const { horizontal, controlId, label} = this.props;
         return (
-            <AutoFormGroup {...this.props}>
+            <AutoFormGroup {...{ horizontal, controlId, label }}>
                 <ColorInput {...this.props}/>
             </AutoFormGroup>
         )

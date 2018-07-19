@@ -8,20 +8,17 @@ export default class FormHandles {
         this.$calendar = $('#calendar')
     };
 
-    onCreateBtnClick(data) {
+    onCreateBtnClick({ start, end, title, backgroundColor }) {
         const fullCalendar = this.$calendar.fullCalendar('getCalendar');
         const moment = fullCalendar.moment.bind(fullCalendar);
-        const title = data.title;
-        const color = data.backgroundColor;
-        const start = moment(data.start);
-        const end = moment(data.end);
-        // 获取用户设置
+        const startMoment = moment(start);
+        const endMoment = moment(end);
         const newEvent = new CalendarEvent({
             title: title || '无标题',
-            start: start,
-            end: end,
-            allDay: start.hasTime() && end.hasTime() ? false : true,
-            backgroundColor: color ? color : '#32CD32',
+            start: startMoment,
+            end: endMoment,
+            allDay: startMoment.hasTime() && endMoment.hasTime() ? false : true,
+            backgroundColor: backgroundColor ? backgroundColor : '#32CD32',
         }, this.$calendar);
         // 保存并渲染事件
         newEvent.saveToWizEventDoc();

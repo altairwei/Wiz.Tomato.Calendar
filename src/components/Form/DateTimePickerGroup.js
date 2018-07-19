@@ -70,8 +70,9 @@ export default class DateTimePickerGroup extends React.Component {
     }
 
     render() {
+        const { horizontal, controlId, label} = this.props;
         return (
-            <AutoFormGroup {...this.props}>
+            <AutoFormGroup {...{ horizontal, controlId, label }}>
                 <DateTimeInput {...this.props} />
             </AutoFormGroup>            
         )

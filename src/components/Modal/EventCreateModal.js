@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavItem, Tab, Button, ButtonToolbar } from 'react-bootstrap';
+import { NavItem, Tab, Button } from 'react-bootstrap';
 import EventDetailFrom from '../Form/EventDetailForm';
 import EventModal from './EventModal'
 import moment from 'moment';
@@ -55,17 +55,18 @@ export default class EventCreateModal extends React.Component {
     }
 
     render() {
-        return (
-            <EventModal {...this.props}>
-                <EventModal.NavHeader {...this.props}>
-                    <NavItem eventKey="1" href="#tc-repeatform">
+        const { show, onModalClose } = this.props;
+        return ( 
+            <EventModal {...{show, onModalClose}}>
+                <EventModal.NavHeader {...{onModalClose}}>
+                    <NavItem eventKey="1" >
                         日程编辑
                     </NavItem>
-                    <NavItem eventKey="2" href="#tc-repeatform">
+                    <NavItem eventKey="2" >
                         重复规则
                     </NavItem>
                 </EventModal.NavHeader>
-                <EventModal.TabBody {...this.props}>
+                <EventModal.TabBody>
                     <Tab.Pane eventKey="1">
                         <EventDetailFrom 
                             eventTitle={this.state.title}

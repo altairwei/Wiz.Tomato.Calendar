@@ -23,10 +23,11 @@ export default class TitleInputGroup extends React.Component {
     }
 
     render() {
+        const { horizontal, controlId, label} = this.props;
         return (
-            <AutoFormGroup label="标题" {...this.props}>
+            <AutoFormGroup {...{ horizontal, controlId, label }}>
                 <FormControl
-                    {...this.props}
+                    autoFocus={this.props.autoFocus}
                     type="text"
                     value={this.state.value}
                     placeholder="请输入标题"

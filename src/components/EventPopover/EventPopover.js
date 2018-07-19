@@ -70,7 +70,7 @@ export default class EventPopover extends React.Component {
         const newTitle = e.target.value;
         this.setState(function(prevState, props) {
             //拷贝前一个对象
-            const newEventData = Object.create(prevState.newEventData);
+            const newEventData = $.extend({}, prevState.newEventData)
             newEventData.title = newTitle;
             return { newEventData };
         })
@@ -80,7 +80,7 @@ export default class EventPopover extends React.Component {
         const newColor = colorValue;
         this.setState(function(prevState, props) {
             //拷贝前一个对象
-            const newEventData = Object.create(prevState.newEventData);
+            const newEventData = $.extend({}, prevState.newEventData)
             newEventData.backgroundColor = newColor;
             return { newEventData };
         })
@@ -164,21 +164,22 @@ export default class EventPopover extends React.Component {
                 <div className="arrow"></div>
                 <div className="tc-popover-header">
                     <PopoverTitleInput 
-                        key={this.props.event.id}
+                        key={'title' + this.props.event.id}
                         eventTitle={this.props.event.title}
                         onTitleChange={this.handleTitleChange} 
                         targetForm='tc-popover-event-editForm' />
                 </div>
                 <div className="tc-popover-body">
                     <Form horizontal id='tc-popover-event-editForm'>
-                        <DateTimePickerGroup horizontal readOnly id = 'tc-editpopper-eventdate' 
+                        <DateTimePickerGroup horizontal readOnly 
+                            controlId= 'tc-editpopper-eventdate' 
                             label={<i className='far fa-calendar-alt fa-lg' />}
                             value={eventStart}
                             onDateTimeChange={this.handleDateTimeChange}
                         />
                         <ColorPickerGroup horizontal 
-                            key={this.props.event.id}
-                            id='tc-editpopper-eventcolor' 
+                            key={'backgroundColor' + this.props.event.id}
+                            controlId='tc-editpopper-eventcolor' 
                             label={<i className='fas fa-paint-brush fa-lg' />}
                             value={colorValue}
                             onColorChange={this.handleColorChange}

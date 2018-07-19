@@ -2,7 +2,8 @@ import React from 'react';
 import Calendar from './components/Calendar/Calendar';
 import EventPopover from './components/EventPopover/EventPopover';
 import EventModal from './components/Modal/EventModal';
-import EventCreatModal from './components/Modal/EventCreateModal'
+import EventCreateModal from './components/Modal/EventCreateModal';
+import EventEditModal from './components/Modal/EventEditModal';
 
 export default class App extends React.Component {
     constructor(props) {
@@ -80,8 +81,8 @@ export default class App extends React.Component {
                 />
                 {
                     !!this.state.selectedRange &&
-                        <EventCreatModal 
-                            key={this.state.selectedRange.jsEvent.pageX}
+                        <EventCreateModal 
+                            key={'create' + this.state.selectedRange.jsEvent.pageX}
                             show={this.state.isCreatingEvent}
                             onModalClose={this.handleModalClose}
                             isCreatingEvent={this.state.isCreatingEvent}
@@ -89,9 +90,18 @@ export default class App extends React.Component {
                         />
                 }
                 {
+                    !!this.state.editingEvent && 
+                        <EventEditModal 
+                            key={'edit' + this.state.editingEvent.id}
+                            show={this.state.isEditingEvent}
+                            onModalClose={this.handleModalClose}
+                            editingEvent={this.state.editingEvent}
+                        />
+                }
+                {
                     !!this.state.isShowingEvent && 
                         <EventPopover 
-                            key={this.state.clickedArgs.event.id}
+                            key={'popover' + this.state.clickedArgs.event.id}
                             event={this.state.clickedArgs.event}
                             reference={this.state.clickedArgs.jsEvent.target}
                             onEditBtnClick={this.handleEventEdit}

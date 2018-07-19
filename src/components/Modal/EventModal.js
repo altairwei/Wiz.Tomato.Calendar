@@ -1,7 +1,5 @@
 import React from 'react';
-import { Modal, Nav, NavItem, Tabs, Tab, Button, Row, Col, CloseButton } from 'react-bootstrap';
-import EventDetailFrom from '../Form/EventDetailForm';
-import moment from 'moment';
+import { Modal, Nav, Tab, Row, Col, CloseButton } from 'react-bootstrap';
 
 class NavHeader extends React.Component {
     //this.props.children 接受 <NavItem />

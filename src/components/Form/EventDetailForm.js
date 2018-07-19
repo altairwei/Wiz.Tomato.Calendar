@@ -21,6 +21,7 @@ export default class EventDetailForm extends React.Component {
                 <TitleInputGroup 
                     autoFocus
                     controlId="tc-createpage-eventtitle"
+                    label="标题"
                     value={this.props.eventTitle} 
                     onTitleChange={handleTitleChange}
                 />
