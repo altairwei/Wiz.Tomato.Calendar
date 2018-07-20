@@ -5,7 +5,7 @@ import 'bootstrap/js/dropdown';
 import 'bootstrap-select';
 import 'bootstrap-select/dist/css/bootstrap-select.css'
 
-class SelectPicker extends React.Component {
+export class SelectPicker extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -22,22 +22,31 @@ class SelectPicker extends React.Component {
     }
 
     componentDidMount() {
+        const { title = '', width = false, multiple, disabled } = this.props
         // 初始化组件
-        this.$el = $(this.el).selectpicker({
-            style: 'btn-default'
+        this.$el = $(this.el);
+        this.$el.val(this.props.value);
+        this.$el.prop('title', title);
+        this.$el.prop('multiple', multiple);
+        this.$el.prop('disabled', disabled);
+        this.$el.selectpicker({
+            style: 'btn-default',
+            width
         });
         //
         this.instance = this.$el.data('selectpicker');
-        // 初始化值
-        this.instance.val(this.props.value)
         // 绑定change事件
         this.$el.on("changed.bs.select", this.handleChange);
     }
 
-    componentDidUpdate(prevProps) {
-        // 手动更新value
-        // 插件能自动更新
-        //this.instance.val(this.state.value);
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        const {disabled} = this.props;
+        this.$el.prop('disabled', disabled);
+        if (disabled) {
+            this.$el.val('')
+        }
+        this.$el.selectpicker('refresh');
+
     }
 
     componentWillUnmount() {
