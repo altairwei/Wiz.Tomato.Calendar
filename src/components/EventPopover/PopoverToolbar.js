@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Button, ButtonGroup, ButtonToolbar, SplitButton, DropdownButton, MenuItem } from 'react-bootstrap';
+import { Button, ButtonGroup, ButtonToolbar, SplitButton, Dropdown, MenuItem } from 'react-bootstrap';
 
 export default class PopoverToolbar extends React.Component {
 
@@ -22,23 +22,27 @@ export default class PopoverToolbar extends React.Component {
                         onClick={this.props.onBtnClick}>
                         编辑
                     </Button>
-                    <SplitButton pullRight 
-                        title='删除' 
-                        id='tc-editpopper-DeleteData' 
+                    <Button id='tc-editpopper-DeleteData'
                         onClick={this.props.onBtnClick}>
-                        <MenuItem 
-                            eventKey="1" 
-                            id='tc-editpopper-OpenDoc'
-                            onClick={this.props.onBtnClick}>
-                            打开源文档
-                        </MenuItem>
-                        <MenuItem 
-                            eventKey="2" 
-                            id='tc-editpopper-DeleteDoc'
-                            onClick={this.props.onBtnClick}>
-                            删除源文档
-                        </MenuItem>
-                    </SplitButton>
+                        删除
+                    </Button>                    
+                    <Dropdown id='tc-editpopper-extra' pullRight>
+                        <Dropdown.Toggle />
+                        <Dropdown.Menu>
+                            <MenuItem 
+                                eventKey="1" 
+                                id='tc-editpopper-OpenDoc'
+                                onClick={this.props.onBtnClick}>
+                                打开源文档
+                            </MenuItem>
+                            <MenuItem 
+                                eventKey="2" 
+                                id='tc-editpopper-DeleteDoc'
+                                onClick={this.props.onBtnClick}>
+                                删除源文档
+                            </MenuItem>
+                        </Dropdown.Menu>
+                    </Dropdown>
                 </ButtonGroup>
             </ButtonToolbar>
         )

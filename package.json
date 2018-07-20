@@ -43,6 +43,7 @@
   },
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.1.0",
+    "awesome-bootstrap-checkbox": "^0.3.7",
     "bootstrap": "^3.3.7",
     "bootstrap-select": "^1.13.1",
     "eonasdan-bootstrap-datetimepicker": "^4.17.47",

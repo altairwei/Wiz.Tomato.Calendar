@@ -1,9 +1,9 @@
 import React from 'react';
-import { NavItem, Tab, Button, ButtonGroup, SplitButton, MenuItem, Row, Col } from 'react-bootstrap';
+import { NavItem, Tab, Button, ButtonGroup, Dropdown, MenuItem, Row, Col } from 'react-bootstrap';
 import EventDetailFrom from '../Form/EventDetailForm';
-import EventModal from './EventModal'
+import EventRepeatForm from '../Form/EventRepeatForm';
+import EventModal from './EventModal';
 import moment from 'moment';
-import EventHandles from '../../models/EventHandles';
 
 class ModalToolbar extends React.Component {
 
@@ -27,23 +27,28 @@ class ModalToolbar extends React.Component {
                             onClick={this.props.onBtnClick}>
                             删除
                         </Button>
-                        <SplitButton pullRight 
-                            title='删除源文档' 
-                            id='tc-editpage-DeleteDoc' 
+                        <Button 
+                            id='tc-editpage-DeleteDoc'
                             onClick={this.props.onBtnClick}>
-                            <MenuItem 
-                                eventKey="1" 
-                                id='tc-editpage-OpenDoc'
-                                onClick={this.props.onBtnClick}>
-                                打开源文档
-                            </MenuItem>
-                            <MenuItem 
-                                eventKey="2" 
-                                id='tc-editpage-openEventDoc'
-                                onClick={this.props.onBtnClick}>
-                                编辑源数据
-                            </MenuItem>
-                        </SplitButton>                                
+                            删除源文档
+                        </Button>
+                        <Dropdown id='tc-editpage-extra' pullRight>
+                            <Dropdown.Toggle />
+                            <Dropdown.Menu>
+                                <MenuItem 
+                                    eventKey="1" 
+                                    id='tc-editpage-OpenDoc'
+                                    onClick={this.props.onBtnClick}>
+                                    打开源文档
+                                </MenuItem>
+                                <MenuItem 
+                                    eventKey="2" 
+                                    id='tc-editpage-EditOriginData'
+                                    onClick={this.props.onBtnClick}>
+                                    编辑源数据
+                                </MenuItem>
+                            </Dropdown.Menu>
+                        </Dropdown>
                     </ButtonGroup>
                 </Col>
                 <Col sm={2} smOffset={3}>
@@ -60,7 +65,6 @@ class ModalToolbar extends React.Component {
 export default class EventEditModal extends React.Component {
     constructor(props) {
         super(props);
-        this.eventHandles = new EventHandles();
         //
         this.state = {
             newEventData: {}
@@ -106,13 +110,10 @@ export default class EventEditModal extends React.Component {
     }
 
     handleBtnClick(e) {
-        //
-        const newEventData = $.extend({}, this.state.newEventData)
-        //
         const id = e.target.id;
         const btnType = id.split('-')[2];
-        const handleName = `on${btnType}BtnClick`;
-        this.eventHandles[handleName](this.props.editingEvent, newEventData)
+        const handleName = `onEvent${btnType}`;
+        this.props[handleName](this.props.editingEvent, this.state.newEventData);
         //
         this.props.onModalClose();
     }
@@ -148,13 +149,17 @@ export default class EventEditModal extends React.Component {
                             onColorchange={this.handleColorChange}
                         />
                     </Tab.Pane>
-                    <Tab.Pane eventKey="2">Tab 1 content</Tab.Pane>
+                    <Tab.Pane eventKey="2">
+                        <EventRepeatForm />
+                    </Tab.Pane>
                 </EventModal.TabBody>
                 <EventModal.ToolbarFooter>
                     <ModalToolbar
                         enableSaveBtn={enableSaveBtn}
                         complete={this.state.complete}
-                        onBtnClick={this.handleBtnClick}/>
+                        onBtnClick={this.handleBtnClick}
+                        onModalClose={onModalClose}
+                        />
                 </EventModal.ToolbarFooter>
             </EventModal>
         )

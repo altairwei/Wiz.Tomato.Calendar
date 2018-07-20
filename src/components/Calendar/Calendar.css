@@ -26,7 +26,10 @@
 
 }
 
-.tc-complete > .fc-content {
+.tc-complete > .fc-content,
+.tc-complete > .fc-content > .fc-time,
+.tc-complete > .fc-content > .fc-title
+{
     text-decoration: line-through !important;
 }
 

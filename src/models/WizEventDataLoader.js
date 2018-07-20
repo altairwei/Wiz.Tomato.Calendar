@@ -6,16 +6,16 @@ import CalendarEvent from './CalendarEvent';
 
 /** 该类与Wiznote的WizDatabase接口交换信息，获取数据 */
 export default class WizEventDataLoader {
+
 	/**
      * 创造一个事件数据加载器.
 	 * @param {string} start 查询起始日期，ISO标准日期字符串.
 	 * @param {string} end 查询截至日期，ISO标准日期字符串.
      */
-	constructor(calendar) {
+	constructor() {
 		if (!objDatabase) throw new Error('WizDatabase not valid !');
 		this.Database = objDatabase;
 		this.userName = objDatabase.UserName;
-		this.$calendar = $(calendar);
 	};
 
 	/**
@@ -65,7 +65,7 @@ export default class WizEventDataLoader {
 				if ( !obj || !Array.isArray(obj) ) return false;
 				for (let i = 0; i < obj.length; i ++) {
 					events.push(
-						new CalendarEvent(obj[i], this.$calendar).toFullCalendarEvent()
+						new CalendarEvent(obj[i]).toFullCalendarEvent()
 					);
 				}
 				
@@ -115,7 +115,7 @@ export default class WizEventDataLoader {
 		
 		for (let i = 0; i < obj.length; i ++) {
 			repeatEvents.push(
-				new CalendarEvent(obj[i], this.$calendar).generateRepeatEvents(start, end)
+				new CalendarEvent(obj[i]).generateRepeatEvents(start, end)
 			)
 		}
 		return repeatEvents;
@@ -195,20 +195,18 @@ export default class WizEventDataLoader {
      * TODO: 该方法可以放置到CalendarEvent的静态方法上
      */
 	createEvent(selectionData, userInputs){
-		try {
-			// 获取用户设置
-			const newEvent = new CalendarEvent({
-				title: userInputs.title ? userInputs.title : '无标题',
-				start: selectionData.start,
-				end: selectionData.end,
-				allDay: selectionData.start.hasTime() && selectionData.end.hasTime() ? false : true,
-				backgroundColor: userInputs.color ? userInputs.color : '#32CD32',
-			}, this.$calendar);
-			// 保存并渲染事件
-			newEvent.saveToWizEventDoc();
-			newEvent.refetchData();
-			newEvent.addToFullCalendar();
-		} catch (e) {console.log(e)}
+		// 获取用户设置
+		const newEvent = new CalendarEvent({
+			title: userInputs.title ? userInputs.title : '无标题',
+			start: selectionData.start,
+			end: selectionData.end,
+			allDay: selectionData.start.hasTime() && selectionData.end.hasTime() ? false : true,
+			backgroundColor: userInputs.color ? userInputs.color : '#32CD32',
+		});
+		// 保存并渲染事件
+		newEvent.saveToWizEventDoc();
+		newEvent.refetchData();
+		return newEvent;
 	}
 
 }

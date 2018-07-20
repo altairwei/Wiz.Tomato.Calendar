@@ -10,7 +10,6 @@ export default class CalendarEvent {
      */
 	constructor( data, calendar ) {
 		if (!g_db) throw new Error('IWizDatabase is not valid.');
-		this.$calendar = calendar ? $(calendar) : $('#calendar');
 		const type = this._checkDataType(data);
 		switch ( type ) {
 			case "WizEvent":
@@ -329,17 +328,10 @@ export default class CalendarEvent {
 	}
 
 	toFullCalendarEvent() {
-		// 注意方法返回的只是FullCalendarEvent的数据类型，并不是event对象
-		const that = this;
-		const newEvent = {};
-		const keys = Object.keys(this);
-		// 去除非必要属性
-		keys.splice( keys.findIndex( (i) => i == '_Info' ), 1);
-		keys.splice( keys.findIndex( (i) => i == '_ExtraInfo' ), 1);
-		// 浅拷贝, 不过主要属性都是基本数据类型，所以不存在引用问题
-		keys.forEach(function(item, index, arr){
-			newEvent[item] = that[item];
-		});
+		const newEvent = $.extend({}, this);
+		// 删除无关数据
+		delete newEvent._Info;
+		delete newEvent._ExtraInfo;
 		return newEvent;
 	};
 
@@ -355,15 +347,6 @@ export default class CalendarEvent {
 		newEvent.created = this.created;
 		newEvent.updated = this.updated;
 		return newEvent;
-	};
-
-	addToFullCalendar() {
-		//TODO: 将自身添加到FullCalendar
-		this.$calendar.fullCalendar( 'addEventSource', {
-			events: [
-				this.toFullCalendarEvent()
-			]
-		});
 	};
 
 	_saveAllProp() {
@@ -437,31 +420,12 @@ export default class CalendarEvent {
 	};
 
 	deleteEventData( isDeleteDoc = false ){
-		let doc = g_db.DocumentFromGUID(this.id);
+		const doc = g_db.DocumentFromGUID(this.id);
 		if (!doc) throw new Error('Can not find Event related WizDocument.')
-		// 移除FullCalendar事件
-		this.$calendar.fullCalendar('removeEvents', this.id);
 		// 移除日历数据
 		doc.RemoveFromCalendar();
 		// 删除文档
 		if ( isDeleteDoc ) doc.Delete();
-	}
-
-	refetchData() {
-		//TODO: 重数据库重新获取数据更新实例
-	};
-
-	refreshEvent(event) {
-		//TODO: 应该自动遍历并修改属性
-		if ( event ) {
-			// 重新渲染FullCalendar事件
-			event.title = this.title;
-			event.backgroundColor = this.backgroundColor;
-			this.$calendar.fullCalendar('updateEvent', event);
-		} else {
-			//用.fullCalendar( ‘clientEvents’ [, idOrFilter ] ) -> Array 获取源数据从而更新
-			//TODO: 遍历并寻找GUID匹配的事件
-		}
 	}
 
 }

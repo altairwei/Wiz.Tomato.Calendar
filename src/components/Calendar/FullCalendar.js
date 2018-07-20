@@ -1,7 +1,7 @@
 import React from 'react';
 import $ from "jquery";
-import fullCalendar from "fullcalendar";
-import moment from 'moment';
+import 'fullcalendar';
+import 'moment';
 
 class FullcalendarObjectMapper{
 	constructor(){
@@ -32,10 +32,6 @@ export default class FullCalendar extends React.Component{
 		this.props.onFullCalendarRender(this.el);
 		const objectMapperSettings = this.fullcalendarObjectMapper.getSettings(this.props);
 		this.instance = this.jq(this.el).fullCalendar(objectMapperSettings);
-	}
-
-  	componentWillReceiveProps(nextProps){
-		  
 	}
 
 	render(){

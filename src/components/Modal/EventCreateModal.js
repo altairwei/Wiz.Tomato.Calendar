@@ -1,15 +1,14 @@
 import React from 'react';
 import { NavItem, Tab, Button } from 'react-bootstrap';
 import EventDetailFrom from '../Form/EventDetailForm';
-import EventModal from './EventModal'
+import EventRepeatForm from '../Form/EventRepeatForm';
+import EventModal from './EventModal';
 import moment from 'moment';
-import EventHandles from '../../models/EventHandles'
 
 export default class EventCreateModal extends React.Component {
 
     constructor(props) {
         super(props);
-        this.eventHandles = new EventHandles();
         //
         this.state = {
             title: '',
@@ -23,6 +22,8 @@ export default class EventCreateModal extends React.Component {
         this.handleEndChange = this.handleEndChange.bind(this);
         this.handleColorChange = this.handleColorChange.bind(this);
         this.handleEventCreate = this.handleEventCreate.bind(this);
+        //
+        this.handleRptBaseRuleChange = this.handleRptBaseRuleChange.bind(this);
     }
 
     handleTitleChange(newTitle) {
@@ -49,8 +50,15 @@ export default class EventCreateModal extends React.Component {
         })
     }
 
+    handleRptBaseRuleChange(newRptBaseRule) {
+        console.log(newRptBaseRule)
+    }    
+
     handleEventCreate() {
-        this.eventHandles.onCreateBtnClick(this.state);
+        // 打包数据
+        const eventData = $.extend({}, this.state);
+        this.props.onEventCreate(eventData);
+        //
         this.props.onModalClose();
     }
 
@@ -80,7 +88,12 @@ export default class EventCreateModal extends React.Component {
                             onColorchange={this.handleColorChange}
                         />
                     </Tab.Pane>
-                    <Tab.Pane eventKey="2">Tab 1 content</Tab.Pane>
+                    <Tab.Pane eventKey="2">
+                        <EventRepeatForm 
+                            rptBaseRule='Weekly'
+                            onRptBaseRuleChange={this.handleRptBaseRuleChange}    
+                        />
+                    </Tab.Pane>
                 </EventModal.TabBody>
                 <EventModal.ToolbarFooter>
                     <Button 

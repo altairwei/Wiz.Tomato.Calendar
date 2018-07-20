@@ -3,7 +3,6 @@ import './EventPopover.css';
 import Popper from 'popper.js';
 import PopoverTitleInput from './PopoverTitleInput';
 import PopoverToolbar from './PopoverToolbar';
-import EventHandles from '../../models/EventHandles';
 import { Form, Glyphicon } from 'react-bootstrap';
 import DateTimePickerGroup from '../Form/DateTimePickerGroup';
 import ColorPickerGroup from '../Form/ColorPickerGroup';
@@ -13,7 +12,6 @@ export default class EventPopover extends React.Component {
         super(props);
         this.popperNode = null;
         this.popperInstance = null;
-        this.eventHandles = new EventHandles();
         //
         this.state = {
             newEventData: {}
@@ -93,17 +91,9 @@ export default class EventPopover extends React.Component {
     handleBtnClick(e) {
         const id = e.target.id;
         const btnType = id.split('-')[2];
-        const handleName = `on${btnType}BtnClick`
+        const handleName = `onEvent${btnType}`;
         this.hide().then( (ret) => {
-            switch(handleName) {
-                case 'onEditBtnClick':
-                    this.props.onEditBtnClick(this.props.event); //交由父元素
-                    break;
-                default:
-                    this.eventHandles[handleName](this.props.event, this.state.newEventData)
-                    break;
-            }
-            
+            this.props[handleName](this.props.event, this.state.newEventData);
         })
     }
 
