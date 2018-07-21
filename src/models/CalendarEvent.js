@@ -89,7 +89,7 @@ export default class CalendarEvent {
 		this.complete = complete;
 		this.dateCompleted = dateCompleted;
 		// 重复事件
-		this.rptRule = rptRule;
+		this.rptRule = rptRule || 'none';
 		this.rptEnd = rptEnd;
 		//
 		this._update();
@@ -241,7 +241,7 @@ export default class CalendarEvent {
 		const rptRule = this.rptRule;
 		let dayArray;
 		let regex;
-		console.count(rptRule);
+		console.log(rptRule);
 		if ( (regex = /^Every(\d)?Weeks?(\d*)$/).test(rptRule) ) {
 			// 每[1234]周[7123456]
 			const curWeekDay = moment(this.start).day();
@@ -381,7 +381,7 @@ export default class CalendarEvent {
 	};
 
 	_createWizEventDoc() {
-		//TODO: 保存全部数据包括Title
+		// 保存全部数据包括Title
 		// 创建WizDoc
 		const location = `My Events/${ moment(this.start).format('YYYY-MM') }/`;
 		const objFolder = g_db.GetFolderByLocation(location, true);

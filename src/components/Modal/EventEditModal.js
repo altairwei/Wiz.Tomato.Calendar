@@ -74,6 +74,7 @@ export default class EventEditModal extends React.Component {
         this.handleStartChange = this.handleStartChange.bind(this);
         this.handleEndChange = this.handleEndChange.bind(this);
         this.handleColorChange = this.handleColorChange.bind(this);
+        this.handleRptRuleChange = this.handleRptRuleChange.bind(this);
         this.handleBtnClick = this.handleBtnClick.bind(this);
     }
 
@@ -105,6 +106,14 @@ export default class EventEditModal extends React.Component {
         this.setState(function(prevState, props) {
             const newEventData = $.extend({}, prevState.newEventData)
             newEventData.backgroundColor = newColorValue;
+            return { newEventData };
+        })
+    }
+
+    handleRptRuleChange(newRptRule) {
+        this.setState(function(prevState, props) {
+            const newEventData = $.extend({}, prevState.newEventData)
+            newEventData.rptRule = newRptRule;
             return { newEventData };
         })
     }
@@ -150,7 +159,10 @@ export default class EventEditModal extends React.Component {
                         />
                     </Tab.Pane>
                     <Tab.Pane eventKey="2">
-                        <EventRepeatForm />
+                        <EventRepeatForm 
+                            rptRule={event.rptRule}
+                            onRptRuleChange={this.handleRptRuleChange}
+                        />
                     </Tab.Pane>
                 </EventModal.TabBody>
                 <EventModal.ToolbarFooter>

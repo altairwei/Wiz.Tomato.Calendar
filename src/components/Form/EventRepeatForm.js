@@ -8,7 +8,8 @@ export default function EventRepeatForm(props) {
         <Form horizontal>
             <RepeatRuleSelectGroup horizontal
                 label="重复规则"
-                rptRule="Weekly"
+                rptRule={props.rptRule}
+                onRptRuleChange={props.onRptRuleChange}
             />
         </Form>
     )

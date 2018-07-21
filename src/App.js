@@ -136,7 +136,7 @@ export default class App extends React.Component {
     // ------------------------------------------------------------
 
     handleEventCreate(eventData) {
-        let { start, end, allDay, title, backgroundColor } = eventData;
+        let { start, end, allDay, title, backgroundColor, rptRule } = eventData;
         const moment = this.fullCalendar.moment.bind(this.fullCalendar);
         // 处理日程数据
         start = moment(start), end = moment(end);
@@ -145,7 +145,7 @@ export default class App extends React.Component {
         const newEvent = new CalendarEvent({
             title: title || '无标题', 
             backgroundColor: backgroundColor || '#32CD32',
-            start, end, allDay
+            start, end, allDay, rptRule
         });
         newEvent.saveToWizEventDoc();
         // 添加到日历

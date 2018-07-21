@@ -14,7 +14,8 @@ export default class EventCreateModal extends React.Component {
             title: '',
             start: this.props.selectedRange.start.format('YYYY-MM-DD HH:mm:ss'),
             end: this.props.selectedRange.end.format('YYYY-MM-DD HH:mm:ss'),
-            backgroundColor: ''
+            backgroundColor: '',
+            rptRule: 'none'
         }
         //
         this.handleTitleChange = this.handleTitleChange.bind(this);
@@ -23,7 +24,7 @@ export default class EventCreateModal extends React.Component {
         this.handleColorChange = this.handleColorChange.bind(this);
         this.handleEventCreate = this.handleEventCreate.bind(this);
         //
-        this.handleRptBaseRuleChange = this.handleRptBaseRuleChange.bind(this);
+        this.handleRptRuleChange = this.handleRptRuleChange.bind(this);
     }
 
     handleTitleChange(newTitle) {
@@ -50,8 +51,10 @@ export default class EventCreateModal extends React.Component {
         })
     }
 
-    handleRptBaseRuleChange(newRptBaseRule) {
-        console.log(newRptBaseRule)
+    handleRptRuleChange(newRptRule) {
+        this.setState({
+            rptRule: newRptRule
+        })
     }    
 
     handleEventCreate() {
@@ -90,8 +93,8 @@ export default class EventCreateModal extends React.Component {
                     </Tab.Pane>
                     <Tab.Pane eventKey="2">
                         <EventRepeatForm 
-                            rptBaseRule='Weekly'
-                            onRptBaseRuleChange={this.handleRptBaseRuleChange}    
+                            rptRule='none'
+                            onRptRuleChange={this.handleRptRuleChange}    
                         />
                     </Tab.Pane>
                 </EventModal.TabBody>

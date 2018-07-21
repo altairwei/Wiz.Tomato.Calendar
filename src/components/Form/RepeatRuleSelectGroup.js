@@ -6,12 +6,59 @@ import AutoFormGroup from  './AutoFormGroup';
 export default class EventRepeatForm extends React.Component {
     constructor(props) {
         super(props);
+        const rptRuleComps = this.splitRptRule(this.props.rptRule);
         this.state = {
             rptRule: this.props.rptRule,
-            disableWeekSelect: true
+            rptBaseRule: '',
+            rptWeekdays: [],
+            disableWeekdaySelect: true,
+            disabledOptions: []
         }
+        $.extend(this.state, rptRuleComps);
+        //
         this.handleRptBaseRuleChange = this.handleRptBaseRuleChange.bind(this);
-        this.handleWeekDayChange = this.handleWeekDayChange.bind(this);
+        this.handleWeekdayChange = this.handleWeekdayChange.bind(this);
+    }
+
+    splitRptRule(rptRule) {
+		let regex, rptRuleComps;
+		if ( (regex = /^Every(\d)?Weeks?(\d*)$/).test(rptRule) ) {
+			// 每[1234]周[7123456]
+			const results = regex.exec(rptRule);
+			const interWeek = results[1];
+			const weekdays = results[2].split('');
+            rptRuleComps = {
+                rptBaseRule: `Every${interWeek}Week`,
+                rptWeekdays: weekdays,
+                disableWeekdaySelect: false
+            }
+		} else if ( (regex = /^EveryWeekday(\d*)$/).test(rptRule) ) {
+			// 每个工作日EveryWeekday135
+			const results = regex.exec(rptRule);
+			const weekdays = results[1] || '12345';
+            rptRuleComps = {
+                rptBaseRule: `EveryWeekday`,
+                rptWeekdays: weekdays,
+                disableWeekdaySelect: false,
+                disabledOptions: [6, 7]
+            }
+		} else if ( (regex = /Daily|Weekly|Monthly|Yearly/).test(rptRule) ) {
+			// Daily|Weekly|Monthly|Yearly
+			const perRule = regex.exec(rptRule)[0]
+            rptRuleComps = {
+                rptBaseRule: perRule,
+                rptWeekdays: [],
+                disableWeekdaySelect: true,
+            }
+		} else {
+            rptRuleComps = {
+                rptBaseRule: 'none',
+                rptWeekdays: [],
+                disableWeekdaySelect: true,
+            }
+        }
+
+		return rptRuleComps;
     }
 
     handleRptBaseRuleChange(newSelection) {
@@ -19,19 +66,35 @@ export default class EventRepeatForm extends React.Component {
             case 'EveryWeek':
             case 'Every2Week':
                 this.setState({
-                    disableWeekSelect: false
+                    rptBaseRule: newSelection,
+                    disableWeekdaySelect: false,
+                    disabledOptions: []
+                })
+                break;
+            case 'EveryWeekday':
+                this.setState({
+                    rptBaseRule: newSelection,
+                    disableWeekdaySelect: false,
+                    disabledOptions: [6, 7]
                 })
                 break;
             default:
                 this.setState({
-                    disableWeekSelect: true
+                    rptBaseRule: newSelection,
+                    disableWeekdaySelect: true
                 })
                 break
         }
+        const newRptRule = newSelection;
+        this.props.onRptRuleChange(newRptRule);
     }
 
-    handleWeekDayChange(newSelection) {
-        console.log(newSelection)
+    handleWeekdayChange(newSelection) {
+        this.setState({
+            rptWeekdays: newSelection,
+        })
+        const newRptRule = this.state.rptBaseRule + newSelection.join('');
+        this.props.onRptRuleChange(newRptRule)
     }
 
     render() {
@@ -42,7 +105,7 @@ export default class EventRepeatForm extends React.Component {
                     <Col sm={4}>
                         <SelectPicker
                             title="请选择重复规则"
-                            value="Weekly"
+                            value={this.state.rptBaseRule}
                             width="auto"
                             onSelectionChange={this.handleRptBaseRuleChange}
                         >
@@ -54,8 +117,8 @@ export default class EventRepeatForm extends React.Component {
                                 <option value="Yearly">每年</option>
                             </optgroup>
                             <optgroup label="复合规则">
-                                <option value="EveryWeek">每一个星期几</option>
-                                <option value="Every2Week">每两个星期几</option>
+                                <option value="EveryWeek">每一个星期</option>
+                                <option value="Every2Week">每两个星期</option>
                                 <option value="EveryWeekday">每个工作日</option>
                             </optgroup>
                         </SelectPicker>
@@ -63,10 +126,12 @@ export default class EventRepeatForm extends React.Component {
                     <Col sm={8}>
                         <SelectPicker
                             multiple
-                            width="80%"
-                            disabled={this.state.disableWeekSelect}
                             title="选择重复的星期"
-                            onSelectionChange={this.handleWeekDayChange}
+                            width="80%"
+                            value={this.state.rptWeekdays}
+                            disabled={this.state.disableWeekdaySelect}
+                            disabledOptions={this.state.disabledOptions}
+                            onSelectionChange={this.handleWeekdayChange}
                         >
                             <option value="1">星期一</option>
                             <option value="2">星期二</option>

@@ -15,42 +15,52 @@ export class SelectPicker extends React.Component {
     }
 
     handleChange(e, clickedIndex, newValue, oldValue) { 
-        const newSelection = this.$el.find('option').eq(clickedIndex).val();
-        this.setState({value: newSelection});
+        // 触发组件周期
+        const newSelection = this.instance.val();
+        this.setState({
+            value: newSelection
+        });
         // 传递
         this.props.onSelectionChange(newSelection);
     }
 
     componentDidMount() {
-        const { title = '', width = false, multiple, disabled } = this.props
+        const { title = '', width = false, multiple, disabled, disabledOptions = [] } = this.props
         // 初始化组件
         this.$el = $(this.el);
-        this.$el.val(this.props.value);
         this.$el.prop('title', title);
         this.$el.prop('multiple', multiple);
         this.$el.prop('disabled', disabled);
+        for (const day of disabledOptions) {
+            this.$el.find(`option[value='${day}']`).prop('disabled', true);
+        }
         this.$el.selectpicker({
             style: 'btn-default',
             width
         });
-        //
+        // 获取插件实例
         this.instance = this.$el.data('selectpicker');
+        // 设置初始值
+        this.instance.val(this.props.value);
         // 绑定change事件
         this.$el.on("changed.bs.select", this.handleChange);
     }
 
     componentDidUpdate(prevProps, prevState, snapshot) {
-        const {disabled} = this.props;
+        const { disabled, disabledOptions = [] } = this.props;
+        // 禁用插件
         this.$el.prop('disabled', disabled);
-        if (disabled) {
-            this.$el.val('')
+        if (disabled) this.$el.val('');
+        // 禁用选项
+        for (const day of disabledOptions) {
+            this.$el.find(`option[value='${day}']`).prop('disabled', true);
         }
-        this.$el.selectpicker('refresh');
+        // 更新组件
+        this.instance.refresh();
 
     }
 
     componentWillUnmount() {
-        // destroy
         this.instance.destroy();
         this.$el.off("changed.bs.select", this.handleChange);
     }
