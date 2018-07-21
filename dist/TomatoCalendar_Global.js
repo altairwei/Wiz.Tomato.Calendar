@@ -63,7 +63,7 @@
 /******/ 	}
 /******/
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "cf00babf4ba950c992de"; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentHash = "193e5196a5fc0adcb888"; // eslint-disable-line no-unused-vars
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
 /******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
@@ -799,7 +799,7 @@
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
-eval("\n\nfunction OnTomatoCalendarClicked() {\n\tvar pluginPath = objApp.GetPluginPathByScriptFileName(\"TomatoCalendar_Global.js\");\n\tobjWindow.ViewHtml(pluginPath + \"dist/index.html\", true);\n}\n\n(function () {\n\tvar pluginPath = objApp.GetPluginPathByScriptFileName(\"TomatoCalendar_Global.js\");\n\tvar languangeFileName = pluginPath + \"plugin.ini\";\n\t// 番茄日历\n\tvar buttonText = objApp.LoadStringFromFile(languangeFileName, \"strTomatoCalendar\");\n\twindow.OnTomatoCalendarClicked = OnTomatoCalendarClicked;\n\tobjWindow.AddToolButton(\"main\", \"TomatoCalendar\", buttonText, pluginPath + \"oldproject/icons/calendar.ico\", \"OnTomatoCalendarClicked\");\n})();\n\nwindow.testButton = function () {\n\talert('hello');\n};\n\n//# sourceURL=webpack:///./src/global.js?");
+eval("\n\nfunction OnTomatoCalendarClicked() {\n\tvar pluginPath = objApp.GetPluginPathByScriptFileName(\"TomatoCalendar_Global.js\");\n\tobjWindow.ViewHtml(pluginPath + \"dist/index.html\", true);\n}\n\n(function () {\n\tvar pluginPath = objApp.GetPluginPathByScriptFileName(\"TomatoCalendar_Global.js\");\n\tvar languangeFileName = pluginPath + \"plugin.ini\";\n\t// 番茄日历\n\tvar buttonText = objApp.LoadStringFromFile(languangeFileName, \"strTomatoCalendar\");\n\twindow.OnTomatoCalendarClicked = OnTomatoCalendarClicked;\n\tobjWindow.AddToolButton(\"main\", \"TomatoCalendar\", buttonText, pluginPath + \"oldproject/icons/calendar.ico\", \"OnTomatoCalendarClicked\");\n})();\n\n//# sourceURL=webpack:///./src/global.js?");
 
 /***/ })
 

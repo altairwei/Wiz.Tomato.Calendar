@@ -11,9 +11,3 @@ function OnTomatoCalendarClicked() {
     window.OnTomatoCalendarClicked = OnTomatoCalendarClicked;
 	objWindow.AddToolButton("main", "TomatoCalendar", buttonText, `${pluginPath}oldproject/icons/calendar.ico`, "OnTomatoCalendarClicked");
 })()
-
-
-
-window.testButton = function(){
-    alert('hello')
-}
