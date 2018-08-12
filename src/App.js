@@ -6,7 +6,11 @@ import EventPopover from './components/EventPopover/EventPopover';
 import EventCreateModal from './components/Modal/EventCreateModal';
 import EventEditModal from './components/Modal/EventEditModal';
 import { rgb2hsl } from './utils/utils';
-import { WizConfirm, WizDatabase as objDatabase, WizExplorerWindow as objWindow } from './utils/WizInterface';
+import { WizConfirm, 
+        WizDatabase as objDatabase, 
+        WizExplorerWindow as objWindow, 
+        WizCommonUI as objCommon 
+} from './utils/WizInterface';
 
 export default class App extends React.Component {
     constructor(props) {
