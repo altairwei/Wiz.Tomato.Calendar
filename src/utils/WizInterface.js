@@ -5,11 +5,13 @@ const WizDatabase = WizExplorerApp.Database;
 const WizCommonUI = WizExplorerApp.CreateWizObject("WizKMControls.WizCommonUI");
 
 function WizConfirm(msg, title) {
-    return WizExplorerWindow.ShowMessage(msg, title, 0x00000020 | 0x00000001) == 1;
+    //return WizExplorerWindow.ShowMessage(msg, title, 0x00000020 | 0x00000001) == 1;
+    return confirm(msg);
 }
 
 function WizAlert(msg) {
-    WizExplorerWindow.ShowMessage(msg, "{p}", 0x00000040);
+    //WizExplorerWindow.ShowMessage(msg, "{p}", 0x00000040);
+    alert(msg);
 }
 
 function WizBubbleMessage(title, msg, color = '#FFFA9D', delay = '3') {

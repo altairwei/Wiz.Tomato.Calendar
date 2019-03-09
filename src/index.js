@@ -6,5 +6,20 @@ import 'bootstrap/dist/css/bootstrap-theme.css';
 import '@fortawesome/fontawesome-free/css/all.css';
 import App from './App';
 import './index.css';
+import QWebChannel from './utils/WizWebChannel'
 
-ReactDOM.render(<App />, document.getElementById('root'));
+new QWebChannel(qt.webChannelTransport, async function (channel) {
+	// init WizNotePlus APIs
+    const objectNames = ["WizExplorerApp", "WizPluginData", "WizPluginModuleData"];
+    for (let i = 0; i < objectNames.length; i++) {
+        const key = objectNames[i];
+        window[key] = channel.objects[key];
+	}
+	window.objApp = WizExplorerApp;
+	window.objWindow = WizExplorerApp.Window;
+	window.objCommon = WizExplorerApp.CommonUI;
+	window.objDatabase = await WizExplorerApp.DatabaseManager.Database();
+	//
+	ReactDOM.render(<App />, document.getElementById('root'));
+})
+

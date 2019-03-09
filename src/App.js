@@ -7,9 +7,9 @@ import EventCreateModal from './components/Modal/EventCreateModal';
 import EventEditModal from './components/Modal/EventEditModal';
 import { rgb2hsl } from './utils/utils';
 import { WizConfirm, 
-        WizDatabase as objDatabase, 
-        WizExplorerWindow as objWindow, 
-        WizCommonUI as objCommon 
+        //WizDatabase as objDatabase, 
+        //WizExplorerWindow as objWindow, 
+        //WizCommonUI as objCommon 
 } from './utils/WizInterface';
 
 export default class App extends React.Component {
@@ -209,14 +209,16 @@ export default class App extends React.Component {
         $(this.calendar).fullCalendar('removeEvents', event.id);
     }
 
-    handleEventOpenDoc(event) {
-        const doc = objDatabase.DocumentFromGUID(event.id);
-        objWindow.ViewDocument(doc, true);
+    async handleEventOpenDoc(event) {
+        const doc = await objDatabase.DocumentFromGUID(event.id);
+        await objWindow.ViewDocument(doc, true);
+        doc.Close();
     }
 
-    handleEventEditOriginData(event) {
-        const doc = objDatabase.DocumentFromGUID(event.id);
-        objCommon.EditCalendarEvent(doc);
+    async handleEventEditOriginData(event) {
+        //const doc = objDatabase.DocumentFromGUID(event.id);
+        //await objCommon.EditCalendarEvent(doc);
+        //doc.Close();
     }
 
     // 生命周期

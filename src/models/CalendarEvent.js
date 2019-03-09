@@ -1,15 +1,16 @@
 import moment from 'moment';
 import 'fullcalendar';
-import { WizDatabase as g_db, WizCommonUI as g_cmn} from '../utils/WizInterface';
+//import { WizDatabase as objDatabase, WizCommonUI as objCommon} from '../utils/WizInterface';
 import Config from '../utils/Config';
+import { QObject } from '../utils/WizWebChannel';
 
 export default class CalendarEvent {
 	/**
      * 创建一个通用日程.
-	 * @param {Object} data 原始数据类型，可以是 WizEvent, FullCalendarEvent 以及 GUID.
+	 * @param {Object} data 原始数据类型，可以是 WizEvent, FullCalendarEvent, WizDocument, GUID 等.
      */
-	constructor( data, calendar ) {
-		if (!g_db) throw new Error('IWizDatabase is not valid.');
+	async constructor( data, calendar ) {
+		if (!objDatabase) throw new Error('IWizDatabase is not valid.');
 		const type = this._checkDataType(data);
 		switch ( type ) {
 			case "WizEvent":
@@ -17,24 +18,33 @@ export default class CalendarEvent {
 				this._create(data, type);
 				break;
 			case "GUID":
-				try {
-					//TODO: 获得WizEvent数据，并创建对象
-					const doc = g_db.DocumentFromGUID(data);
-					const newEventData = {
-						"CALENDAR_END" : doc.GetParamValue('CALENDAR_END'),
-						"CALENDAR_INFO" : doc.GetParamValue('CALENDAR_INFO'),
-						"CALENDAR_EXTRAINFO" : doc.GetParamValue('CALENDAR_EXTRAINFO'),
-						"CALENDAR_START" : doc.GetParamValue('CALENDAR_START'),
-						"CALENDAR_RECURRENCE" : doc.GetParamValue('CALENDAR_RECURRENCE'),
-						"CALENDAR_ENDRECURRENCE" : doc.GetParamValue('CALENDAR_ENDRECURRENCE'),
-						"created" : moment(doc.DateCreated).format('YYYY-MM-DD HH:mm:ss'),
-						"guid" : doc.GUID,
-						"title" : doc.Title,
-						"updated" : moment(doc.DateModified).format('YYYY-MM-DD HH:mm:ss')
-					}
-					this._create(newEventData, 'WizEvent');
-				} catch (e) { console.error(e); }
+				const doc = await objDatabase.DocumentFromGUID(data);
+				const newEventData = await this._getEventDataFromWizDocument(doc);
+				this._create(newEventData, 'WizEvent');
+				doc.Close();
 				break;
+			case "WizDocument":
+				const doc = data;
+				const newEventData = await this._getEventDataFromWizDocument(doc);
+				this._create(newEventData, 'WizEvent');
+				doc.Close();
+				break;
+		}
+	};
+
+	async _getEventDataFromWizDocument(doc) {
+		//TODO: await 如果有性能瓶颈，再考虑 Promise.all
+		return {
+			"CALENDAR_END" : await doc.GetParamValue('CALENDAR_END'),
+			"CALENDAR_INFO" : await doc.GetParamValue('CALENDAR_INFO'),
+			"CALENDAR_EXTRAINFO" : await doc.GetParamValue('CALENDAR_EXTRAINFO'),
+			"CALENDAR_START" : await doc.GetParamValue('CALENDAR_START'),
+			"CALENDAR_RECURRENCE" : await doc.GetParamValue('CALENDAR_RECURRENCE'),
+			"CALENDAR_ENDRECURRENCE" : await doc.GetParamValue('CALENDAR_ENDRECURRENCE'),
+			"created" : moment(doc.DateCreated).format('YYYY-MM-DD HH:mm:ss'),
+			"guid" : doc.GUID,
+			"title" : doc.Title,
+			"updated" : moment(doc.DateModified).format('YYYY-MM-DD HH:mm:ss')
 		}
 	};
 
@@ -93,7 +103,7 @@ export default class CalendarEvent {
 		this.rptEnd = rptEnd;
 		//
 		this._update();
-	}
+	};
 
 	_checkDataType(data) {
 		const objClass = data.constructor;
@@ -110,7 +120,10 @@ export default class CalendarEvent {
 				} else if ( data.start && data.title ) {
 					type = 'FullCalendarEvent';
 				}
-                break;
+				break;
+			case QObject:
+				type = 'WizDocument'
+				break;
         }
         return type;
 	};
@@ -349,83 +362,87 @@ export default class CalendarEvent {
 		return newEvent;
 	};
 
-	_saveAllProp() {
+	async _saveAllProp() {
 		//TODO: 保存全部数据包括Title
 		// 更新事件文档数据
-		const doc = g_db.DocumentFromGUID(this.id);
+		const doc = await objDatabase.DocumentFromGUID(this.id);
 		// 保存标题
 		doc.Title = this.title;
 		// 保存时间数据
 		if ( this.allDay ) {
 			let startStr = moment(this.start).set({'h': 0, 'm': 0, 's': 0}).format('YYYY-MM-DD HH:mm:ss');
 			let endStr = moment(this.end).set({'h': 23, 'm': 59, 's': 59}).format('YYYY-MM-DD HH:mm:ss');
-			this._setParamValue(doc, "CALENDAR_START", startStr);
-			this._setParamValue(doc, "CALENDAR_END", endStr);
+			await this._setParamValue(doc, "CALENDAR_START", startStr);
+			await this._setParamValue(doc, "CALENDAR_END", endStr);
 		} else {
 			let startStr = moment(this.start).format('YYYY-MM-DD HH:mm:ss');
 			let endStr = moment(this.end).format('YYYY-MM-DD HH:mm:ss');
-			this._setParamValue(doc, "CALENDAR_START", startStr);
-			this._setParamValue(doc, "CALENDAR_END", endStr);
+			await this._setParamValue(doc, "CALENDAR_START", startStr);
+			await this._setParamValue(doc, "CALENDAR_END", endStr);
 		}
 
 		// 保存 CALENDAR_INFO
 		this._update();
-		this._setParamValue(doc, "CALENDAR_INFO", this._stringifyInfo(this._Info));
-		this._setParamValue(doc, "CALENDAR_EXTRAINFO", this._stringifyInfo(this._ExtraInfo));
+		await this._setParamValue(doc, "CALENDAR_INFO", this._stringifyInfo(this._Info));
+		await this._setParamValue(doc, "CALENDAR_EXTRAINFO", this._stringifyInfo(this._ExtraInfo));
+		doc.Close();
 	};
 
 	// 设置文档属性值
-	_setParamValue(doc, key, value) {
+	async _setParamValue(doc, key, value) {
 		if (!doc) return false;
-		doc.SetParamValue(key, value);
+		await doc.SetParamValue(key, value);
 	};
 
-	_createWizEventDoc() {
+	async _createWizEventDoc() {
 		// 保存全部数据包括Title
 		// 创建WizDoc
 		const location = `My Events/${ moment(this.start).format('YYYY-MM') }/`;
-		const objFolder = g_db.GetFolderByLocation(location, true);
-		const tempHtml = g_cmn.GetATempFileName('.html');
+		const objFolder = await objDatabase.GetFolderByLocation(location, true);
+		const tempHtml = await objCommon.GetATempFileName('.html');
 		const htmlText = this._getEventHtml(this.title, '');
-		g_cmn.SaveTextToFile(tempHtml, htmlText, 'unicode');
-		const doc = objFolder.CreateDocument2(this.title, "");
-		doc.ChangeTitleAndFileName(this.title);
-		doc.UpdateDocument6(tempHtml, tempHtml, 0x22);
+		await objCommon.SaveTextToFile(tempHtml, htmlText, 'unicode');
+		const doc = await objFolder.CreateDocument2(this.title, "");
+		await doc.ChangeTitleAndFileName(this.title);
+		await doc.UpdateDocument6(tempHtml, tempHtml, 0x22);
 		// 设置标签
 		//if ( tags ) doc.SetTagsText2(tags, "Calendar");
 		// 将信息编码到WizDoc属性中去
 		const newEvent = this.toWizEventData();
-		doc.AddToCalendar(newEvent.CALENDAR_START, newEvent.CALENDAR_END, newEvent.CALENDAR_INFO);
+		await doc.AddToCalendar(newEvent.CALENDAR_START, newEvent.CALENDAR_END, newEvent.CALENDAR_INFO);
 		// change database
-		doc.type = "event";
+		//doc.type = "event";
 		//
 		this.id = doc.GUID;
+		doc.Close();
 	}
 
-	saveToWizEventDoc( prop = 'all' ) {
-		if (!g_db || !g_cmn) throw new Error('IWizDatabase or IWizCommonUI is not valid.');
+	async saveToWizEventDoc( prop = 'all' ) {
+		if (!objDatabase || !objCommon) throw new Error('IWizDatabase or IWizCommonUI is not valid.');
 		//检查文档是否存在
 		const guidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 		const isWizDocExist = guidRegex.test(this.id);
 		// 创建或者更新文档
 		if ( isWizDocExist ) {
 			// 根据指令更新内容
-			this._saveAllProp();
+			await this._saveAllProp();
 			// 更新FullCalendar
 		} else {
 			// 创建新的事件文档
-			this._createWizEventDoc();
+			await this._createWizEventDoc();
 		}
 		
 	};
 
-	deleteEventData( isDeleteDoc = false ){
-		const doc = g_db.DocumentFromGUID(this.id);
+	async deleteEventData( isDeleteDoc = false ){
+		const doc = await objDatabase.DocumentFromGUID(this.id);
 		if (!doc) throw new Error('Can not find Event related WizDocument.')
 		// 移除日历数据
-		doc.RemoveFromCalendar();
+		await doc.RemoveFromCalendar();
 		// 删除文档
 		if ( isDeleteDoc ) doc.Delete();
+
+		doc.Close();
 	}
 
 }
