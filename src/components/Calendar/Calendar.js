@@ -2,7 +2,7 @@ import React from 'react';
 import FullCalendar from './FullCalendar';
 import 'fullcalendar-reactwrapper/dist/css/fullcalendar.min.css';
 import './Calendar.css';
-import Clock from '../Clock/TomatoClock'
+//import Clock from '../Clock/TomatoClock'
 
 export default class Calendar extends React.Component {
     constructor(props) {
@@ -11,10 +11,10 @@ export default class Calendar extends React.Component {
             events: []
         }
         this.calendar = null;
-        this.clock = new Clock();
+        //this.clock = new Clock();
         //绑定句柄
         this.handleFullCalendarRender = this.handleFullCalendarRender.bind(this);
-        this.handleClockStart = this.handleClockStart.bind(this);
+        //this.handleClockStart = this.handleClockStart.bind(this);
     }
 
     // 事件句柄
@@ -26,18 +26,18 @@ export default class Calendar extends React.Component {
         this.props.onCalendarRender(el);
     }
 
-    handleClockStart(e) {
-        const isActive = $(e.target).hasClass('fc-state-active');
-        if ( isActive ) {
-            $(e.target).removeClass('fc-state-active').text('计时');
-            this.clock.stopTomatoClock();
-        } else {
-            // 开始计时
-            $(e.target).addClass('fc-state-active').text('停止');
-            this.clock.startTomatoClock();
-        }
+    // handleClockStart(e) {
+    //     const isActive = $(e.target).hasClass('fc-state-active');
+    //     if ( isActive ) {
+    //         $(e.target).removeClass('fc-state-active').text('计时');
+    //         this.clock.stopTomatoClock();
+    //     } else {
+    //         // 开始计时
+    //         $(e.target).addClass('fc-state-active').text('停止');
+    //         this.clock.startTomatoClock();
+    //     }
 
-    }
+    // }
  
     render() {
         /**
@@ -58,12 +58,12 @@ export default class Calendar extends React.Component {
                         center: 'title',
                         right: 'month,agendaWeek,agendaDay,listWeek'
                     }}
-                    customButtons={{
-                        startClock: {
-                            text: '计时',
-                            click: this.handleClockStart
-                        }
-                    }}
+                    // customButtons={{
+                    //     startClock: {
+                    //         text: '计时',
+                    //         click: this.handleClockStart
+                    //     }
+                    // }}
                     // 中文化
                     buttonText = {{
                         today: '今天',

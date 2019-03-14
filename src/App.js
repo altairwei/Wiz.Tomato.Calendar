@@ -64,27 +64,27 @@ export default class App extends React.Component {
         })
     }
 
-    handleViewRender( view, element ) {
+    async handleViewRender( view, element ) {
         // 刷新视图，重新获取日历事件
         const $calendar = $(this.calendar);
-        const eventSources = this.dataLoader.getEventSources( view, element );
+        const eventSources = await this.dataLoader.getEventSources( view, element );
         $calendar.fullCalendar('removeEvents');
         for (let i=0 ; i < eventSources.length; i++) {
             $calendar.fullCalendar('addEventSource', eventSources[i]);
         }
     }
 
-    handleEventDrop( event, delta, revertFunc, jsEvent, ui, view ) {
+    async handleEventDrop( event, delta, revertFunc, jsEvent, ui, view ) {
         if (event.id){
-            this.dataLoader.updateEventDataOnDrop(event, delta, revertFunc, jsEvent, ui, view)
+            await this.dataLoader.updateEventDataOnDrop(event, delta, revertFunc, jsEvent, ui, view)
         } else {
             revertFunc();
-        }        
+        }
     }
 
-    handleEventResize( event, delta, revertFunc, jsEvent, ui, view ) {
+    async handleEventResize( event, delta, revertFunc, jsEvent, ui, view ) {
         if (event.id){
-            this.dataLoader.updateEventDataOnResize(event, delta, revertFunc, jsEvent, ui, view);
+            await this.dataLoader.updateEventDataOnResize(event, delta, revertFunc, jsEvent, ui, view);
         } else {
             revertFunc();
         }
@@ -139,19 +139,19 @@ export default class App extends React.Component {
     // 处理按钮功能
     // ------------------------------------------------------------
 
-    handleEventCreate(eventData) {
+    async handleEventCreate(eventData) {
         let { start, end, allDay, title, backgroundColor, rptRule } = eventData;
         const moment = this.fullCalendar.moment.bind(this.fullCalendar);
         // 处理日程数据
         start = moment(start), end = moment(end);
         allDay = !( start.hasTime() && end.hasTime() );
         // 新建日程
-        const newEvent = new CalendarEvent({
+        const newEvent = await new CalendarEvent({
             title: title || '无标题', 
             backgroundColor: backgroundColor || '#32CD32',
             start, end, allDay, rptRule
-        });
-        newEvent.saveToWizEventDoc();
+        }).init();
+        await newEvent.saveToWizEventDoc();
         // 添加到日历
 		$(this.calendar).fullCalendar( 'addEventSource', {
 			events: [
@@ -160,17 +160,17 @@ export default class App extends React.Component {
 		});
     }
 
-    handleEventSave(event, newEventData) {
+    async handleEventSave(event, newEventData) {
         for (const prop in newEventData) {
             event[prop] = newEventData[prop]
         }
-        const newEvent = new CalendarEvent(event);
-        newEvent.saveToWizEventDoc();
+        const newEvent = await new CalendarEvent(event).init();
+        await newEvent.saveToWizEventDoc();
         //
         $(this.calendar).fullCalendar( 'updateEvent', event );
     }
 
-    handleEventComplete(event) {
+    async handleEventComplete(event) {
         // 修改数据
         const isComplete = parseInt(event.complete) == 5;
         if ( isComplete ) {
@@ -179,8 +179,8 @@ export default class App extends React.Component {
             event.complete = '5';
         }
         // 保存数据
-        const newEvent = new CalendarEvent(event);
-        newEvent.saveToWizEventDoc();
+        const newEvent = await new CalendarEvent(event).init();
+        await newEvent.saveToWizEventDoc();
         //
         $(this.calendar).fullCalendar( 'updateEvent', event );
     }
@@ -192,19 +192,19 @@ export default class App extends React.Component {
         })        
     }
 
-    handleEventDeleteData(event) {
+    async handleEventDeleteData(event) {
         if ( WizConfirm("确定要删除该日程？", '番茄助理') ) {
             // 删除日程
-            let newEvent = new CalendarEvent(event);
-            newEvent.deleteEventData(false);
+            let newEvent = await new CalendarEvent(event).init();
+            await newEvent.deleteEventData(false);
         }
 		$(this.calendar).fullCalendar('removeEvents', event.id);
     }
 
-    handleEventDeleteDoc(event) {
+    async handleEventDeleteDoc(event) {
         if ( WizConfirm("确定要删除该日程源文档？\n「确定」将会导致相关笔记被删除！", '番茄助理') ) {
-            let newEvent = new CalendarEvent(event);
-            newEvent.deleteEventData(true);
+            let newEvent = await new CalendarEvent(event).init();
+            await newEvent.deleteEventData(true);
         }
         $(this.calendar).fullCalendar('removeEvents', event.id);
     }

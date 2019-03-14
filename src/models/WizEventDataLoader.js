@@ -52,7 +52,7 @@ export default class WizEventDataLoader {
      */
 	async _getAllOriginalEvent(start, end){
 		const events = [];
-		let sql = `DOCUMENT_LOCATION not like '/Deleted Items/%' and (KB_GUID is null or KB_GUID = '')`;
+		let sql = `DOCUMENT_LOCATION not like '/Deleted Items/%'`;
 		let and1 = ` and DOCUMENT_GUID in (select DOCUMENT_GUID from WIZ_DOCUMENT_PARAM where PARAM_NAME = 'CALENDAR_START'  and  PARAM_VALUE <= '${end}' )`;
 		let and2 = ` and DOCUMENT_GUID in (select DOCUMENT_GUID from WIZ_DOCUMENT_PARAM where PARAM_NAME = 'CALENDAR_END'  and  PARAM_VALUE >= '${start}' )`;
 		if (start) sql += and2;
@@ -61,7 +61,7 @@ export default class WizEventDataLoader {
 		const docColletion = await objDatabase.DocumentsFromSQLWhere(sql);
 		//
 		for (const doc of docColletion) {
-			const newEvent = await new CalendarEvent(doc);
+			const newEvent = await new CalendarEvent(doc).init();
 			events.push(newEvent.toFullCalendarEvent());
 			if (doc.Close) doc.Close();
 		}
@@ -80,7 +80,7 @@ export default class WizEventDataLoader {
 
 		const docColletion = await objDatabase.DocumentsFromSQLWhere(sql);
 		for (const doc of docColletion) {
-			const newEvent = await new CalendarEvent(doc);
+			const newEvent = await new CalendarEvent(doc).init();
 			repeatEvents.push(newEvent.generateRepeatEvents(start, end));
 			if (doc.Close) doc.Close();
 		}
@@ -171,7 +171,7 @@ export default class WizEventDataLoader {
 			end: selectionData.end,
 			allDay: selectionData.start.hasTime() && selectionData.end.hasTime() ? false : true,
 			backgroundColor: userInputs.color ? userInputs.color : '#32CD32',
-		});
+		}).init();
 		// 保存并渲染事件
 		await newEvent.saveToWizEventDoc();
 		//newEvent.refetchData();
