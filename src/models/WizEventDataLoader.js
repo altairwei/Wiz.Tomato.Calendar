@@ -1,4 +1,4 @@
-import { WizDatabase as objDatabase } from './WizInterface';
+//import { WizDatabase as objDatabase } from '../utils/WizInterface';
 import CalendarEvent from './CalendarEvent';
 
 /* 数据获取
@@ -6,17 +6,16 @@ import CalendarEvent from './CalendarEvent';
 
 /** 该类与Wiznote的WizDatabase接口交换信息，获取数据 */
 export default class WizEventDataLoader {
+
 	/**
      * 创造一个事件数据加载器.
 	 * @param {string} start 查询起始日期，ISO标准日期字符串.
 	 * @param {string} end 查询截至日期，ISO标准日期字符串.
      */
-	constructor(start, end) {
+	constructor() {
 		if (!objDatabase) throw new Error('WizDatabase not valid !');
 		this.Database = objDatabase;
-		this.userName = objDatabase.UserName;
-		this.start = start;
-		this.end = end;
+		//this.userName = objDatabase.UserName;
 	};
 
 	/**
@@ -25,7 +24,7 @@ export default class WizEventDataLoader {
 	 * @param {object} element is a jQuery element for the container of the new view.
      * @return {Object[]} 返回用于FullCalendar 渲染的 eventSources 数组.
      */
-	getEventSources( view, element ){
+	async getEventSources( view, element ){
 		const viewStart = view.start.format('YYYY-MM-DD HH:mm:ss');
 		const viewEnd = view.end.format('YYYY-MM-DD HH:mm:ss');
 		let eventSources = [];
@@ -33,12 +32,12 @@ export default class WizEventDataLoader {
 		const generalEventSource = {
 			type: 'generalEvents',
 			//events: this._getAllOriginalEvent([], this._d2s(currentView.start.toDate()), this._d2s(currentView.end.toDate()))
-			events: this._getAllOriginalEvent(viewStart, viewEnd)
+			events: await this._getAllOriginalEvent(viewStart, viewEnd)
 		}
 		eventSources.push(generalEventSource);
 		
 		//TODO: 获取重复日程
-		const repeatEventSources = this._getAllRepeatEvent(viewStart, viewEnd);
+		const repeatEventSources = await this._getAllRepeatEvent(viewStart, viewEnd);
 		eventSources = eventSources.concat(repeatEventSources);
 		//
 		return eventSources;
@@ -51,50 +50,22 @@ export default class WizEventDataLoader {
 	 * @param {string} end ISO标准日期字符串.
      * @return {Object[]} 返回用于FullCalendar渲染的事件数组.
      */
-	_getAllOriginalEvent(start, end){
+	async _getAllOriginalEvent(start, end){
 		const events = [];
-		let sql = `DOCUMENT_LOCATION not like '/Deleted Items/%' and (KB_GUID is null or KB_GUID = '')`;
+		let sql = `DOCUMENT_LOCATION not like '/Deleted Items/%'`;
 		let and1 = ` and DOCUMENT_GUID in (select DOCUMENT_GUID from WIZ_DOCUMENT_PARAM where PARAM_NAME = 'CALENDAR_START'  and  PARAM_VALUE <= '${end}' )`;
 		let and2 = ` and DOCUMENT_GUID in (select DOCUMENT_GUID from WIZ_DOCUMENT_PARAM where PARAM_NAME = 'CALENDAR_END'  and  PARAM_VALUE >= '${start}' )`;
 		if (start) sql += and2;
 		if (end) sql += and1;
-		if (objDatabase.DocumentsDataFromSQL) {
-			try {
-				const data = objDatabase.DocumentsDataFromSQL(sql);
-				if ( !data ) return false;
-				const obj = JSON.parse(data);
-				if ( !obj || !Array.isArray(obj) ) return false;
-				for (let i = 0; i < obj.length; i ++) {
-					events.push(
-						new CalendarEvent(obj[i]).toFullCalendarEvent()
-					);
-				}
-				
-				return events;
-			}
-			catch(err) {
-				console.error(err);
-				return false;
-			}
+		//
+		const docColletion = await objDatabase.DocumentsFromSQLWhere(sql);
+		//
+		for (const doc of docColletion) {
+			const newEvent = await new CalendarEvent(doc).init();
+			events.push(newEvent.toFullCalendarEvent());
+			if (doc.Close) doc.Close();
 		}
-		else {
-			throw new Error('DocumentsDataFromSQL method of WizDatabase not exist!');
-			/*
-			let docColletion = objDatabase.DocumentsFromSQL(sql);
-			//
-			if (docColletion && docColletion.Count){
-				let doc;
-				for (let i = 0; i < docColletion.Count; ++ i){
-					doc = docColletion.Item(i);
-					let eventObj = _eventObject(_newPseudoDoc(doc));
-					if (eventObj)
-						events.push(eventObj);
-				}
-				return events;
-			}
-			*/		
-		}
-
+		return events;
 	};
 
 	/**
@@ -102,58 +73,54 @@ export default class WizEventDataLoader {
 	 * 从创建事件的日期开始到ENDRECURRENCE结束
      * @return {Object[]} 返回用于FullCalendar渲染的 eventSource 数组.
      */
-	_getAllRepeatEvent(start, end){
+	async _getAllRepeatEvent(start, end){
 		const repeatEvents = [];
 		const sql = "DOCUMENT_LOCATION not like '/Deleted Items/%' and (KB_GUID is null or KB_GUID = '') and " + 
 					"DOCUMENT_GUID in (select DOCUMENT_GUID from WIZ_DOCUMENT_PARAM where PARAM_NAME='CALENDAR_RECURRENCE')";
 
-		const data = objDatabase.DocumentsDataFromSQL(sql);
-		console.log(data)
-		if ( !data ) return false;
-		
-		const obj = JSON.parse(data);
-		if ( !obj || !Array.isArray(obj) ) return false;
-		
-		for (let i = 0; i < obj.length; i ++) {
-			repeatEvents.push(
-				new CalendarEvent(obj[i]).generateRepeatEvents(start, end)
-			)
+		const docColletion = await objDatabase.DocumentsFromSQLWhere(sql);
+		for (const doc of docColletion) {
+			const newEvent = await new CalendarEvent(doc).init();
+			repeatEvents.push(newEvent.generateRepeatEvents(start, end));
+			if (doc.Close) doc.Close();
 		}
+
 		return repeatEvents;
 		
 	};
 
 	// 日历事件拖动后更新数据
-	updateEventDataOnDrop(event, delta, revertFunc, jsEvent, ui, view){
+	async updateEventDataOnDrop(event, delta, revertFunc, jsEvent, ui, view){
 		// Call hasTime on the event’s start/end to see if it has been dropped in a timed or all-day area.
 		const allDay = !event.start.hasTime();
 		// 获取事件文档时间数据
-		const doc = objDatabase.DocumentFromGUID(event.id);
+		const doc = await objDatabase.DocumentFromGUID(event.id);
 		// 更新数据
 		if ( allDay ) {
 			const startStr = event.start.set({'h': 0, 'm': 0, 's': 0}).format('YYYY-MM-DD HH:mm:ss');
 			const endStr = event.end.set({'h': 23, 'm': 59, 's': 59}).format('YYYY-MM-DD HH:mm:ss');
-			this._setParamValue(doc, "CALENDAR_START", startStr);
-			this._setParamValue(doc, "CALENDAR_END", endStr);
+			await this._setParamValue(doc, "CALENDAR_START", startStr);
+			await this._setParamValue(doc, "CALENDAR_END", endStr);
 		} else {
 			const startStr = event.start.format('YYYY-MM-DD HH:mm:ss');
 			const endStr = event.end.format('YYYY-MM-DD HH:mm:ss');
-			this._setParamValue(doc, "CALENDAR_START", startStr);
-			this._setParamValue(doc, "CALENDAR_END", endStr);
+			await this._setParamValue(doc, "CALENDAR_START", startStr);
+			await this._setParamValue(doc, "CALENDAR_END", endStr);
 		}
 		//TODO: 更新CALENDAR_RECURRENCE数据
 		// 
-		this._updateDocModifyDate(doc);
+		await this._updateDocModifyDate(doc);
+		doc.Close();
 	};
 
 	// 设置文档属性值
-	_setParamValue(doc, key, value) {
+	async _setParamValue(doc, key, value) {
 		if (!doc) return false;
-		doc.SetParamValue(key, value);
+		await doc.SetParamValue(key, value);
 	};
 
 	// 更新WizDoc修改时间
-	_updateDocModifyDate(doc){
+	async _updateDocModifyDate(doc){
 		const now = new Date();
 		if (!doc) return false;
 		now.setSeconds((now.getSeconds() + 1) % 60);
@@ -173,15 +140,16 @@ export default class WizEventDataLoader {
 	};
 
 	// 日历时间重置时间范围后更新数据
-	updateEventDataOnResize(event, delta, revertFunc, jsEvent, ui, view){
+	async updateEventDataOnResize(event, delta, revertFunc, jsEvent, ui, view){
 		const allDay = event.start.hasTime() ? false : true;
 		// 获得事件文档时间数据
-		const doc = objDatabase.DocumentFromGUID(event.id);
+		const doc = await objDatabase.DocumentFromGUID(event.id);
 		// 计算更改后的结束时间
 		const eventEndStr = event.end.format('YYYY-MM-DD HH:mm:ss');
 		// 更新文档数据
-		this._setParamValue(doc, "CALENDAR_END", eventEndStr);
-		this._updateDocModifyDate(doc);
+		await this._setParamValue(doc, "CALENDAR_END", eventEndStr);
+		await this._updateDocModifyDate(doc);
+		doc.Close();
 	};
 
 	// 创建事件 start, end, jsEvent, view
@@ -195,21 +163,19 @@ export default class WizEventDataLoader {
 	 * @param {Object} userInputs 用户传入的其他信息.
      * TODO: 该方法可以放置到CalendarEvent的静态方法上
      */
-	createEvent(selectionData, userInputs){
-		try {
-			// 获取用户设置
-			const newEvent = new CalendarEvent({
-				title: userInputs.title ? userInputs.title : '无标题',
-				start: selectionData.start,
-				end: selectionData.end,
-				allDay: selectionData.start.hasTime() && selectionData.end.hasTime() ? false : true,
-				backgroundColor: userInputs.color ? userInputs.color : '#32CD32',
-			});
-			// 保存并渲染事件
-			newEvent.saveToWizEventDoc();
-			newEvent.refetchData();
-			newEvent.addToFullCalendar();
-		} catch (e) {console.log(e)}
+	async createEvent(selectionData, userInputs){
+		// 获取用户设置
+		const newEvent = await new CalendarEvent({
+			title: userInputs.title ? userInputs.title : '无标题',
+			start: selectionData.start,
+			end: selectionData.end,
+			allDay: selectionData.start.hasTime() && selectionData.end.hasTime() ? false : true,
+			backgroundColor: userInputs.color ? userInputs.color : '#32CD32',
+		}).init();
+		// 保存并渲染事件
+		await newEvent.saveToWizEventDoc();
+		//newEvent.refetchData();
+		return newEvent;
 	}
 
 }

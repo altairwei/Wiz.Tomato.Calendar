@@ -7,25 +7,6 @@ html, body {
     outline:none;
 }
 
-#calendar-container {
-    position: fixed;
-    top: 0;
-    left: 8px;
-    right: 8px;
-    bottom: 8px;
-}
-
-.fc-header-toolbar {
-    /*
-    the calendar will be butting up against the edges,
-    but let's scoot in the header's buttons
-    */
-    padding-top: 14px;
-    padding-left: 0;
-    padding-right: 0;
-}
-
-
 /* Fonts.css -- 跨平台中文字体解决方案
 -----------------------------------------------------------------*/
 .font-hei {font-family: -apple-system, "Noto Sans", "Helvetica Neue", Helvetica, "Nimbus Sans L", Arial, "Liberation Sans", "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", "Source Han Sans SC", "Source Han Sans CN", "Microsoft YaHei", "Wenquanyi Micro Hei", "WenQuanYi Zen Hei", "ST Heiti", SimHei, "WenQuanYi Zen Hei Sharp", sans-serif;}
@@ -66,19 +47,4 @@ a[data-goto] {
 }
 .input-group-addon:last-child {
   border-right-width: 1px;
-}
-
-/* 事件渲染
--------------------------------------------------------------------------*/
-.tc-complete {
-    opacity: 0.3;
-
-}
-
-.tc-complete > .fc-content {
-    text-decoration: line-through !important;
-}
-
-.tc-complete:hover {
-    opacity: 1;
 }

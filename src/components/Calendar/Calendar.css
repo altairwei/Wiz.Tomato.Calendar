@@ -1,0 +1,38 @@
+
+/* 日历整体样式
+-------------------------------------------------------------------------*/
+#calendar-container {
+    position: fixed;
+    top: 0;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
+}
+
+.fc-header-toolbar {
+    /*
+    the calendar will be butting up against the edges,
+    but let's scoot in the header's buttons
+    */
+    padding-top: 14px;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+/* 事件渲染
+-------------------------------------------------------------------------*/
+.tc-complete {
+    opacity: 0.3;
+
+}
+
+.tc-complete > .fc-content,
+.tc-complete > .fc-content > .fc-time,
+.tc-complete > .fc-content > .fc-title
+{
+    text-decoration: line-through !important;
+}
+
+.tc-complete:hover {
+    opacity: 1;
+}

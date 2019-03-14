@@ -158,19 +158,3 @@
 .tc-popover-body {
     padding: 10px 15px;
 }
-
-#tc-editpopper-eventtitle {
-    border-width: 1px;
-    border-color: transparent;
-    background-color: transparent;
-    padding: 0;
-    margin: 0;
-    font-size: 1.2em;
-    font-weight: bold;
-}
-
-#tc-editpopper-eventtitle:focus,
-#tc-editpopper-eventtitle:hover {
-    outline: none;
-    border-bottom-color: black; 
-}

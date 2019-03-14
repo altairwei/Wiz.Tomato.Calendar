@@ -5,7 +5,7 @@ import FormHandles from '../Utils/FormHandles';
 import { createDatetimePicker } from '../Widget/DateTimePicker';
 import { createColorPicker } from '../Widget/ColorPicker';
 import { createBootstrapSelect } from '../Widget/BootstrapSelect'
-import EventModal from './EventModal';
+import EventModal from './EventModalOld';
 
 export default class EventEditModal extends EventModal {
 
