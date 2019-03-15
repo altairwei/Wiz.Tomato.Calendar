@@ -11,12 +11,11 @@
 /******/
 /******/ 	// eslint-disable-next-line no-unused-vars
 /******/ 	function hotDownloadUpdateChunk(chunkId) {
-/******/ 		var head = document.getElementsByTagName("head")[0];
 /******/ 		var script = document.createElement("script");
 /******/ 		script.charset = "utf-8";
 /******/ 		script.src = __webpack_require__.p + "" + chunkId + "." + hotCurrentHash + ".hot-update.js";
-/******/ 		;
-/******/ 		head.appendChild(script);
+/******/ 		if (null) script.crossOrigin = null;
+/******/ 		document.head.appendChild(script);
 /******/ 	}
 /******/
 /******/ 	// eslint-disable-next-line no-unused-vars
@@ -63,12 +62,15 @@
 /******/ 	}
 /******/
 /******/ 	var hotApplyOnUpdate = true;
-/******/ 	var hotCurrentHash = "373589cc21e8e7a08806"; // eslint-disable-line no-unused-vars
+/******/ 	// eslint-disable-next-line no-unused-vars
+/******/ 	var hotCurrentHash = "8ef8c64586d054375df1";
 /******/ 	var hotRequestTimeout = 10000;
 /******/ 	var hotCurrentModuleData = {};
-/******/ 	var hotCurrentChildModule; // eslint-disable-line no-unused-vars
-/******/ 	var hotCurrentParents = []; // eslint-disable-line no-unused-vars
-/******/ 	var hotCurrentParentsTemp = []; // eslint-disable-line no-unused-vars
+/******/ 	var hotCurrentChildModule;
+/******/ 	// eslint-disable-next-line no-unused-vars
+/******/ 	var hotCurrentParents = [];
+/******/ 	// eslint-disable-next-line no-unused-vars
+/******/ 	var hotCurrentParentsTemp = [];
 /******/
 /******/ 	// eslint-disable-next-line no-unused-vars
 /******/ 	function hotCreateRequire(moduleId) {
@@ -160,7 +162,7 @@
 /******/ 			// Module API
 /******/ 			active: true,
 /******/ 			accept: function(dep, callback) {
-/******/ 				if (typeof dep === "undefined") hot._selfAccepted = true;
+/******/ 				if (dep === undefined) hot._selfAccepted = true;
 /******/ 				else if (typeof dep === "function") hot._selfAccepted = dep;
 /******/ 				else if (typeof dep === "object")
 /******/ 					for (var i = 0; i < dep.length; i++)
@@ -168,7 +170,7 @@
 /******/ 				else hot._acceptedDependencies[dep] = callback || function() {};
 /******/ 			},
 /******/ 			decline: function(dep) {
-/******/ 				if (typeof dep === "undefined") hot._selfDeclined = true;
+/******/ 				if (dep === undefined) hot._selfDeclined = true;
 /******/ 				else if (typeof dep === "object")
 /******/ 					for (var i = 0; i < dep.length; i++)
 /******/ 						hot._declinedDependencies[dep[i]] = true;
@@ -257,8 +259,8 @@
 /******/ 			});
 /******/ 			hotUpdate = {};
 /******/ 			var chunkId = "TomatoCalendar_Global";
+/******/ 			// eslint-disable-next-line no-lone-blocks
 /******/ 			{
-/******/ 				// eslint-disable-line no-lone-blocks
 /******/ 				/*globals chunkId */
 /******/ 				hotEnsureUpdateChunk(chunkId);
 /******/ 			}
