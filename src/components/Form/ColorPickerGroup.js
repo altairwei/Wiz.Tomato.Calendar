@@ -46,7 +46,14 @@ class ColorInput extends React.Component {
             ]
         });
         //初始化颜色
-        this.huebeeInstance.setColor(this.props.value);
+        if (this.state.value == 'random') {
+            const colorArray = Object.keys(this.huebeeInstance.colorGrid)
+                                        .concat(this.huebeeInstance.options.customColors);
+            const randomColor = colorArray[Math.floor(Math.random()*colorArray.length)];
+            this.huebeeInstance.setColor(randomColor);
+        } else {
+            this.huebeeInstance.setColor(this.props.value);
+        }
         //监听huebee颜色选择
         this.huebeeInstance.on( 'change', this.handleChange)
     }

@@ -14,7 +14,7 @@ export default class EventCreateModal extends React.Component {
             title: '',
             start: this.props.selectedRange.start.format('YYYY-MM-DD HH:mm:ss'),
             end: this.props.selectedRange.end.format('YYYY-MM-DD HH:mm:ss'),
-            backgroundColor: '',
+            backgroundColor: 'random',
             rptRule: 'none'
         }
         //
