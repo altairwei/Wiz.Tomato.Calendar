@@ -51,6 +51,7 @@ class ColorInput extends React.Component {
                                         .concat(this.huebeeInstance.options.customColors);
             const randomColor = colorArray[Math.floor(Math.random()*colorArray.length)];
             this.huebeeInstance.setColor(randomColor);
+            this.handleChange(randomColor);
         } else {
             this.huebeeInstance.setColor(this.props.value);
         }
