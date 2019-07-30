@@ -10,7 +10,7 @@ import QWebChannel from './utils/WizWebChannel'
 
 new QWebChannel(qt.webChannelTransport, async function (channel) {
 	// init WizNotePlus APIs
-    const objectNames = ["WizExplorerApp", "WizPluginData", "WizPluginModuleData"];
+    const objectNames = ["WizExplorerApp", "JSPluginSpec", "JSPluginModuleSpec"];
     for (let i = 0; i < objectNames.length; i++) {
         const key = objectNames[i];
         window[key] = channel.objects[key];
